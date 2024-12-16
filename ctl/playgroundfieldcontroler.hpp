@@ -84,6 +84,7 @@ public:
   bool invalidSelection() const;
   Position findFreeSlot() const;
   static Entity::Type getRandomType();
+  void detectLine (Position a_position);
   /// @}
 
   /****************************************//**

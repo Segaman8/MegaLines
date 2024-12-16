@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QList>
 #include <QSharedPointer>
+#include <functional>
 
 /* DEFINES */
 
@@ -28,8 +29,9 @@ PlaygroundFieldControler::PlaygroundFieldControler()
   : QObject()
   , p (new Private)
 {
-  qRegisterMetaType<PlaygroundFieldControler::Position> ("Position");
+  qRegisterMetaType<PlaygroundFieldControler::Position> ("PlaygroundFieldControlerPosition");
   qRegisterMetaType<quint32> ("quint32");
+  qRegisterMetaType<Entity::Type> ("EntityType");
 
   clear();
 }
@@ -181,6 +183,7 @@ bool PlaygroundFieldControler::moveTo (quint16 a_x, quint16 a_y)
   p->field[oldIndex]  = std::move (p->field[index]);
 
   emit sigMoved (p->selected, current);
+  detectLine (current);
   return true;
 }
 
@@ -251,6 +254,132 @@ PlaygroundFieldControler::Position PlaygroundFieldControler::findFreeSlot() cons
 Entity::Type PlaygroundFieldControler::getRandomType()
 {
   return Entity::Type (qrand() % int (Entity::Type::SIZE));
+}
+
+void PlaygroundFieldControler::detectLine (Position a_position)
+{
+  /* defines */
+
+  enum Direction
+  {
+    Horizontal,
+    Vertical,
+    DiagonalLeft,
+    DiagonalRight,
+  };
+
+  typedef std::function<void()> Lambda;
+
+  /* variables */
+
+  quint8 counter;
+  Entity::Type desiredType;
+
+  QList<Position> found[4] =
+  {
+    { a_position },
+    { a_position },
+    { a_position },
+    { a_position },
+  };
+
+  /* get desired type */
+
+  {
+    auto index      = coordToIndex (a_position);
+    Entity &entity  = p->field[index];
+    desiredType     = entity.type();
+  }
+
+  /* lambda's */
+
+  auto searchForItems =
+    [this, a_position, &counter, &found, desiredType] (
+      qint16 a_horAccel,
+      qint16 a_verAccel)
+  {
+    /* variables */
+    Position position
+    {
+      quint16 (a_position.x + a_horAccel),
+      quint16 (a_position.y + a_verAccel)
+    };
+
+    while (counter < 5
+           && position.x < p->width
+           && position.y < p->height)
+    {
+      /* variables */
+      int index = coordToIndex (position);
+
+      /* fail */
+      if (p->field[index].type() != desiredType)
+        return;
+
+      /* found */
+      found[Direction::DiagonalLeft].append (position);
+      counter++;
+
+      /* apply accel */
+      position.x = quint16 (position.x + a_horAccel);
+      position.y = quint16 (position.y + a_verAccel);
+    }
+  };
+
+  Lambda lambdaDirections[4] =
+  {
+    /* Horizontal */
+    [&counter, searchForItems]()
+    {
+      counter = 0;
+      searchForItems (-1, 0);
+      searchForItems (1, 0);
+    },
+
+    /* Vertical */
+    [&counter, searchForItems]()
+    {
+      counter = 0;
+      searchForItems (0, -1);
+      searchForItems (0, 1);
+    },
+
+    /* DiagonalLeft */
+    [&counter, searchForItems]()
+    {
+      counter = 0;
+      searchForItems (-1, -1);
+      searchForItems (1, 1);
+    },
+
+    /* DiagonalRight */
+    [&counter, searchForItems]()
+    {
+      counter = 0;
+      searchForItems (1, -1);
+      searchForItems (-1, 1);
+    },
+  };
+
+  /* execute search in four directions */
+
+  for (int i = 0; i < 4; i++)
+  {
+    /* execute direction search */
+
+    auto lambda = lambdaDirections[i];
+    lambda();
+
+    /* check if found enough items */
+
+    if (counter != 5)
+      continue;
+
+    /* send signal */
+
+    emit sigGotLine (std::move (found[i]));
+    break;
+  }
 }
 
 /*-----------------------------------------*/
