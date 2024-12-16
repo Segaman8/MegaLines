@@ -36,14 +36,14 @@ Entity::Entity (Entity &&a_src)
  * METHODS
  *******************************************/
 
-quint16 Entity::type() const
+Entity::Type Entity::type() const
 {
-  return quint16 (m_type);
+  return m_type;
 }
 
-void Entity::setType (quint16 a_value)
+void Entity::setType (Type a_value)
 {
-  if (quint16 (m_type) == a_value)
+  if (m_type == a_value)
     return;
 
   m_type  = Type (a_value);

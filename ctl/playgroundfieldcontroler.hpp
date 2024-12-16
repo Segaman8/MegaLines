@@ -23,8 +23,6 @@ class PlaygroundFieldControler : public QObject
   /// @{
 protected:
 
-  typedef QSharedPointer<Entity> EntityPtr;
-
   struct Position
   {
     quint16 x, y;
@@ -65,7 +63,7 @@ public:
 
   /* get entity */
 
-  const EntityPtr &at (quint16 a_x, quint16 a_y) const;
+  const Entity &at (quint16 a_x, quint16 a_y) const;
   Entity value (quint16 a_x, quint16 a_y) const;
 
   /* interact with entities */
@@ -77,13 +75,14 @@ public:
 
   /* field control */
 
-  void setFieldSize (quint16 a_width, quint16 a_height);
+  void newGame (quint16 a_width, quint16 a_height);
   void clear();
 
   quint16 coordToIndex (Position a_position) const;
   quint16 coordToIndex (quint16 a_x, quint16 a_y) const;
   Position indexToCoord (quint16 a_index) const;
   bool invalidSelection() const;
+  Position findFreeSlot() const;
   static Entity::Type getRandomType();
   /// @}
 

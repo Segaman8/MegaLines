@@ -19,7 +19,7 @@ class Entity : public QObject
    * @name PROPERTIES
    *******************************************/
   /// @{
-  Q_PROPERTY (quint16 type READ type WRITE setType NOTIFY sigTypeChanged)
+  Q_PROPERTY (Type type READ type WRITE setType NOTIFY sigTypeChanged)
   Q_PROPERTY (quint16 x READ x WRITE setX NOTIFY sigPosChanged)
   Q_PROPERTY (quint16 y READ y WRITE setY NOTIFY sigPosChanged)
   /// @}
@@ -70,8 +70,8 @@ public:
    *******************************************/
   /// @{
 public:
-  quint16 type() const;
-  void setType (quint16 a_value);
+  Type type() const;
+  void setType (Type a_value);
 
   quint16 x() const;
   void setX (quint16 a_value);

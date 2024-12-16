@@ -8,23 +8,16 @@
 
 /* DEFINES */
 
-typedef QSharedPointer<Entity> EntityPtr;
-
 struct PlaygroundFieldControler::Private
 {
-  struct
-  {
-    QMap<quint16, EntityPtr> free;
-    QMap<quint16, EntityPtr> used;
-    QList<EntityPtr> field;
+  QList<Entity> field;
 
-    quint16 width = 9,
-            height = 9;
-  } slot;
-
-  quint16 score = 0;
+  quint16 width   = 9;
+  quint16 height  = 9;
+  quint16 score   = 0;
 
   Position selected;
+  Position invalid;
 };
 
 /********************************************
@@ -65,28 +58,28 @@ quint32 PlaygroundFieldControler::score() const
 /* get entity */
 
 
-const PlaygroundFieldControler::EntityPtr &PlaygroundFieldControler::at (quint16 a_x, quint16 a_y) const
+const Entity &PlaygroundFieldControler::at (quint16 a_x, quint16 a_y) const
 {
   /* check boundaries */
-  static const PlaygroundFieldControler::EntityPtr dummy;
-  if (a_x >= p->slot.width
-      || a_y >= p->slot.height)
+  static const Entity dummy;
+  if (a_x >= p->width
+      || a_y >= p->height)
     return dummy;
 
   /* get proper item */
-  return p->slot.field.at (coordToIndex (a_x, a_y));
+  return p->field.at (coordToIndex (a_x, a_y));
 }
 
 Entity PlaygroundFieldControler::value (quint16 a_x, quint16 a_y) const
 {
   /* check boundaries */
   static const Entity dummy;
-  if (a_x >= p->slot.width
-      || a_y >= p->slot.height)
+  if (a_x >= p->width
+      || a_y >= p->height)
     return dummy;
 
   /* get proper item */
-  return *p->slot.field.at (coordToIndex (a_x, a_y)).get();
+  return p->field.at (coordToIndex (a_x, a_y));
 }
 
 
@@ -95,22 +88,21 @@ Entity PlaygroundFieldControler::value (quint16 a_x, quint16 a_y) const
 
 void PlaygroundFieldControler::createAt (quint16 a_x, quint16 a_y, Entity::Type a_type)
 {
-  /* variables */
-  auto index  = coordToIndex (a_x, a_y);
-
-  /* check if free */
-  if (!p->slot.free.contains (index))
+  /* check boundaries */
+  if (a_x >= p->width
+      || a_y >= p->height)
     return;
 
-  /* take entity from free */
-  auto entity = p->slot.free.take (index);
+  /* variables */
+  auto index    = coordToIndex (a_x, a_y);
+  auto &entity  = p->field[index];
 
-  /* update and restore into used */
-  entity->setType (quint16 (a_type));
-  p->slot.used.insert (index, entity);
+  /* check if free */
+  if (entity.type() != Entity::Type::Free)
+    return;
 
-  /* put on field */
-  p->slot.field[index] = entity;
+  /* update */
+  entity.setType (a_type);
 
   emit sigCreated ({ a_x, a_y });
 }
@@ -118,37 +110,40 @@ void PlaygroundFieldControler::createAt (quint16 a_x, quint16 a_y, Entity::Type 
 void PlaygroundFieldControler::createRandom()
 {
   /* variables */
-  int size  = p->slot.free.size();
-  if (size == 0)
+  auto freeSlot  = findFreeSlot();
+  if (freeSlot == p->invalid)
     return emit sigGameOver();
 
-  int index = qrand() % size;
-
-  /* take entity */
-  auto entity = p->slot.free.take (index);
+  /* get entity */
+  int index     = coordToIndex (freeSlot);
+  auto &entity  = p->field[index];
 
   /* update and restore into used */
-  entity->setType (quint16 (getRandomType()));
-  p->slot.used.insert (index, entity);
+  entity.setType (getRandomType());
 
-  /* put on field */
-  p->slot.field[index] = entity;
-
-  emit sigCreated (indexToCoord (index));
+  emit sigCreated (freeSlot);
 }
 
 bool PlaygroundFieldControler::select (quint16 a_x, quint16 a_y)
 {
+  /* check boundaries */
+  if (a_x >= p->width
+      || a_y >= p->height)
+    return false;
+
+  /* get entity */
+  auto index    = coordToIndex (a_x, a_y);
+  auto &entity  = p->field[index];
+
   /* fail, if not used */
-  auto index  = coordToIndex (a_x, a_y);
-  if (!p->slot.used.contains (index))
+  if (entity.type() == Entity::Type::Free)
     return false;
 
   /* unselect, if already selected */
   Position newSelection { a_x, a_y };
   if (p->selected == newSelection)
     {
-      p->selected = Position { p->slot.width, p->slot.height };
+      p->selected = p->invalid;
       emit sigUnselected();
       return true;
     }
@@ -161,23 +156,31 @@ bool PlaygroundFieldControler::select (quint16 a_x, quint16 a_y)
 
 bool PlaygroundFieldControler::moveTo (quint16 a_x, quint16 a_y)
 {
+  /* check boundaries */
+  if (a_x >= p->width
+      || a_y >= p->height)
+    return false;
+
   /* fail, if nothing selected */
   if (invalidSelection())
     return false;
 
+  /* variables */
+  Position current { a_x, a_y };
+
+  /* get entity */
+  auto index    = coordToIndex (current);
+  auto &entity  = p->field[index];
+
   /* fail, if not free */
-  auto index  = coordToIndex (a_x, a_y);
-  if (p->slot.used.contains (index))
+  if (entity.type() != Entity::Type::Free)
     return false;
 
   /* move */
-  auto oldIndex = coordToIndex (p->selected.x, p->selected.y);
-  auto entity   = p->slot.used.take (oldIndex);
-  p->slot.used.insert (index, entity);
+  auto oldIndex       = coordToIndex (p->selected);
+  p->field[oldIndex]  = std::move (p->field[index]);
 
-  p->slot.field[oldIndex] = std::move (p->slot.field[index]);
-
-  emit sigMoved (p->selected, Position { a_x, a_y });
+  emit sigMoved (p->selected, current);
   return true;
 }
 
@@ -185,48 +188,41 @@ bool PlaygroundFieldControler::moveTo (quint16 a_x, quint16 a_y)
 /* field control */
 
 
-void PlaygroundFieldControler::setFieldSize (quint16 a_width, quint16 a_height)
+void PlaygroundFieldControler::newGame (quint16 a_width, quint16 a_height)
 {
   if (a_width == 0 || a_width < 9
       || a_height == 0 || a_height < 9)
     return;
 
-  p->slot.width   = a_width;
-  p->slot.height  = a_height;
+  p->width   = a_width;
+  p->height  = a_height;
   clear();
 }
 
 void PlaygroundFieldControler::clear()
 {
-  /* clear objects */
+  /* clear containers */
 
-  p->slot.free.clear();
-  p->slot.used.clear();
-  p->score  = 0;
+  p->field.clear();
+  p->score    = 0;
+  p->selected = p->invalid = Position { p->width, p->height };
 
-  /* allocate free and field slots */
+  /* allocate field slots */
 
-  for (int y = 0; y < p->slot.height; y++)
-    for (int x = 0; x < p->slot.height; x++)
-      {
-        quint16 index     = coordToIndex (x, y);
-
-        /* free slot */
-        p->slot.free.insert (index, EntityPtr::create (Entity::Type::Free, x, y));
-
-        /* field slot */
-        p->slot.field.append (EntityPtr::create (Entity::Type::Free, x, y));
-      }
+  p->field.reserve (p->height * p->height);
+  for (int y = 0; y < p->height; y++)
+    for (int x = 0; x < p->height; x++)
+      p->field.append (Entity (Entity::Type::Free, x, y));
 }
 
 quint16 PlaygroundFieldControler::coordToIndex (Position a_position) const
 {
-  return a_position.x + a_position.y * p->slot.width;
+  return a_position.x + a_position.y * p->width;
 }
 
 quint16 PlaygroundFieldControler::coordToIndex (quint16 a_x, quint16 a_y) const
 {
-  return a_x + a_y * p->slot.width;
+  return a_x + a_y * p->width;
 }
 
 PlaygroundFieldControler::Position PlaygroundFieldControler::indexToCoord (quint16 a_index) const
@@ -234,15 +230,22 @@ PlaygroundFieldControler::Position PlaygroundFieldControler::indexToCoord (quint
   return
     Position
     {
-      quint16 (a_index % p->slot.width),
-      quint16 (a_index / p->slot.width)
+      quint16 (a_index % p->width),
+      quint16 (a_index / p->width)
     };
 }
 
 bool PlaygroundFieldControler::invalidSelection() const
 {
-  return p->selected.x == p->slot.width
-         || p->selected.y == p->slot.height;
+  return p->selected == p->invalid;
+}
+
+PlaygroundFieldControler::Position PlaygroundFieldControler::findFreeSlot() const
+{
+  for (quint16 i = 0; i < p->field.size(); i++)
+    if (p->field.at (i).type() == Entity::Type::Free)
+      return indexToCoord (i);
+  return p->invalid;
 }
 
 Entity::Type PlaygroundFieldControler::getRandomType()
