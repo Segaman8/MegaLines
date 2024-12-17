@@ -5,6 +5,8 @@ import QtQuick.Layouts 1.0
 import QtQuick.Controls 1.0
 import com.PlaygroundField 1.0
 
+import "../widgets"
+
 /****************************************//**
  * @brief Page Game Form
  * @date 17.12.24
@@ -41,6 +43,7 @@ Item {
     /// @{
 
     signal sigEntityClicked (int a_index);
+    signal sigMenuClicked();
 
     Component.onCompleted: bridgeManager.connectQmlForm (root);
 
@@ -100,11 +103,27 @@ Item {
         anchors.right: parent.right
         anchors.topMargin: 12
         anchors.rightMargin: 20
-        z: 20
+        z: 50
 
         font.pixelSize: 14
         text: `Score: ${root.internal.score}`
         color: "#ddd"
+    }
+
+    /* menu button */
+
+    ButtonWidget {
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.topMargin: 30
+        z: 50
+
+        width: 96
+        height: 40
+        text: "Menu"
+        onClicked: function() {
+            root.sigMenuClicked();
+        }
     }
 
     /* play field */

@@ -1,7 +1,10 @@
 /* INCLUDES */
 
 #include "bridgepagegame.hpp"
+#include "bridgemain.hpp"
+#include "formbridgemanager.hpp"
 #include "ctl/playgroundfieldcontroler.hpp"
+#include "ctl/gamestoragecontroler.hpp"
 
 #include <QDebug>
 
@@ -108,6 +111,15 @@ void BridgePageGame::slotEntityClicked (int a_index)
     else
       DEBUGINFO << "failed moving" << a_index;
   }
+}
+
+void BridgePageGame::slotMenuClicked()
+{
+  DEBUGINFO;
+
+  GameStorageControler::instance()->save();
+  FormBridgeManager::mainQml()->as<BridgeMain>()->switchToTab (0);
+
 }
 
 /*-----------------------------------------*/

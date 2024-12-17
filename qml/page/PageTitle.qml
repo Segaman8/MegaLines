@@ -4,6 +4,8 @@ import QtQuick 2.0
 import QtQuick.Layouts 1.0
 import QtQuick.Controls 1.0
 
+import "../widgets"
+
 /****************************************//**
  * @brief Page Title Form
  * @date 17.12.24
@@ -49,50 +51,6 @@ Item {
      * @name COMPONENTS
      ********************************************/
     /// @{
-
-    Component {
-        id: compButton
-
-        // property string text
-        // property var onClicked
-
-        Rectangle {
-            id: compButtonRoot
-            anchors.fill: parent
-            z: 10
-            color: hovered ? "#666" : "#555"
-            radius: height * 0.125
-
-            property bool hovered: false
-
-            Rectangle {
-                anchors.fill: parent
-                anchors.bottomMargin: parent.height / 2
-                z: 20
-                radius: parent.radius
-                color: "#eee"
-                opacity: compButtonRoot.hovered ? 0.175 : 0.125
-            }
-
-            Text {
-                anchors.fill: parent
-                z: 30
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 20
-                text: compButtonRoot.parent.text
-                color: "#eee"
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: compButtonRoot.parent.onClicked();
-                onEntered: compButtonRoot.hovered = true;
-                onExited:  compButtonRoot.hovered = false;
-            }
-        }
-    }
 
     /// @}
     /****************************************//**
@@ -164,34 +122,31 @@ Item {
              : root.width * 0.75
         height: root.internal.buttonHeight * 3
 
-        Loader {
+        ButtonWidget {
             Layout.fillWidth: true
             Layout.preferredHeight: root.internal.buttonHeight
-            sourceComponent: compButton
-            property string text: "Continue"
-            property var onClicked: function() {
+            text: "Continue"
+            onClicked: function() {
                 //console.log(`${text} clicked!`);
                 root.sigContinueClicked();
             }
         }
 
-        Loader {
+        ButtonWidget {
             Layout.fillWidth: true
             Layout.preferredHeight: root.internal.buttonHeight
-            sourceComponent: compButton
-            property string text: "New Game"
-            property var onClicked: function() {
+            text: "New Game"
+            onClicked: function() {
                 //console.log(`${text} clicked!`);
                 root.sigNewGameClicked();
             }
         }
 
-        Loader {
+        ButtonWidget {
             Layout.fillWidth: true
             Layout.preferredHeight: root.internal.buttonHeight
-            sourceComponent: compButton
-            property string text: "Quit"
-            property var onClicked: function() {
+            text: "Quit"
+            onClicked: function() {
                 //console.log(`${text} clicked!`);
                 root.sigQuitClicked();
             }

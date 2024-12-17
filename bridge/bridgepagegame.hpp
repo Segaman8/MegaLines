@@ -60,6 +60,8 @@ public slots:
   /* GUI */
 
   void slotEntityClicked (int a_index);
+  void slotMenuClicked();
+
   /// @}
 };
 
