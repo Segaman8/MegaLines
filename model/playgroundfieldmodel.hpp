@@ -5,6 +5,8 @@
 
 #include <QAbstractItemModel>
 
+#include "util/position.hpp"
+
 /****************************************//**
  * @brief Playground Field Model Class
  * @date 16.12.2024
@@ -35,6 +37,22 @@ public:
    *******************************************/
   /// @{
 public:
+  /// @}
+
+  /****************************************//**
+   * @name SLOTS
+   *******************************************/
+  /// @{
+public slots:
+  void slotCreated (Position a_pos);
+  void slotSelected (Position a_selection);
+  void slotUnselected();
+  void slotMoved (Position a_from, Position a_to);
+  void slotGotLine (QList<Position> a_positions);
+  void slotGameOver();
+  void slotNewGame();
+  void slotFieldCreated();
+  void slotScoreChanged (quint32 a_value);
   /// @}
 
   /****************************************//**

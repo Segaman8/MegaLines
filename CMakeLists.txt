@@ -28,6 +28,8 @@ set(PROJECT_HEADERS
   model/playgroundfieldmodel.hpp
 
   objects/entity.hpp
+
+  util/position.hpp
 )
 
 set(PROJECT_ASSETS

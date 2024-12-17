@@ -37,6 +37,55 @@ PlaygroundFieldModel::~PlaygroundFieldModel()
 }
 
 /********************************************
+ * SLOTS
+ *******************************************/
+
+void PlaygroundFieldModel::slotCreated (Position a_pos)
+{
+
+}
+
+void PlaygroundFieldModel::slotSelected (Position a_selection)
+{
+
+}
+
+void PlaygroundFieldModel::slotUnselected()
+{
+
+}
+
+void PlaygroundFieldModel::slotMoved (Position a_from, Position a_to)
+{
+
+}
+
+void PlaygroundFieldModel::slotGotLine (QList<Position> a_positions)
+{
+
+}
+
+void PlaygroundFieldModel::slotGameOver()
+{
+
+}
+
+void PlaygroundFieldModel::slotNewGame()
+{
+
+}
+
+void PlaygroundFieldModel::slotFieldCreated()
+{
+
+}
+
+void PlaygroundFieldModel::slotScoreChanged (quint32 a_value)
+{
+
+}
+
+/********************************************
  * METHODS
  *******************************************/
 

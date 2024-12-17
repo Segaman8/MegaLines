@@ -11,6 +11,7 @@
 
 struct PlaygroundFieldControler::Private
 {
+  QSet<quint16> freeIndexes;
   QList<Entity> field;
 
   quint16 width   = 9;
@@ -29,7 +30,8 @@ PlaygroundFieldControler::PlaygroundFieldControler()
   : QObject()
   , p (new Private)
 {
-  qRegisterMetaType<PlaygroundFieldControler::Position> ("PlaygroundFieldControlerPosition");
+  qRegisterMetaType<Position> ("Position");
+  qRegisterMetaType<PositionList> ("PositionList");
   qRegisterMetaType<quint32> ("quint32");
   qRegisterMetaType<Entity::Type> ("EntityType");
 
@@ -72,6 +74,17 @@ const Entity &PlaygroundFieldControler::at (quint16 a_x, quint16 a_y) const
   return p->field.at (coordToIndex (a_x, a_y));
 }
 
+const Entity &PlaygroundFieldControler::atIndex (quint16 a_index) const
+{
+  /* check boundaries */
+  static const Entity dummy;
+  if (a_index >= p->field.size())
+    return dummy;
+
+  /* get proper item */
+  return p->field.at (a_index);
+}
+
 Entity PlaygroundFieldControler::value (quint16 a_x, quint16 a_y) const
 {
   /* check boundaries */
@@ -82,6 +95,32 @@ Entity PlaygroundFieldControler::value (quint16 a_x, quint16 a_y) const
 
   /* get proper item */
   return p->field.at (coordToIndex (a_x, a_y));
+}
+
+Entity PlaygroundFieldControler::valueAtIndex (quint16 a_index) const
+{
+  /* check boundaries */
+  static const Entity dummy;
+  if (a_index >= p->field.size())
+    return dummy;
+
+  /* get proper item */
+  return p->field.at (a_index);
+}
+
+quint16 PlaygroundFieldControler::width() const
+{
+  return p->width;
+}
+
+quint16 PlaygroundFieldControler::height() const
+{
+  return p->height;
+}
+
+QSize PlaygroundFieldControler::size() const
+{
+  return QSize { p->width, p->height };
 }
 
 
@@ -103,6 +142,9 @@ void PlaygroundFieldControler::createAt (quint16 a_x, quint16 a_y, Entity::Type 
   if (entity.type() != Entity::Type::Free)
     return;
 
+  /* remove from free set */
+  p->freeIndexes.remove (index);
+
   /* update */
   entity.setType (a_type);
 
@@ -111,19 +153,28 @@ void PlaygroundFieldControler::createAt (quint16 a_x, quint16 a_y, Entity::Type 
 
 void PlaygroundFieldControler::createRandom()
 {
-  /* variables */
-  auto freeSlot  = findFreeSlot();
-  if (freeSlot == p->invalid)
+  /* check if no free left */
+  if (p->freeIndexes.size() == 0)
     return emit sigGameOver();
 
+  /* variables */
+  quint16 index;
+
+  /* get free index */
+  {
+    quint16 freeIndexInt  = qrand() % p->freeIndexes.size();
+    auto freeIndex        = p->freeIndexes.begin() + freeIndexInt;
+    index                 = *freeIndex;
+    p->freeIndexes.erase (freeIndex);
+  }
+
   /* get entity */
-  int index     = coordToIndex (freeSlot);
   auto &entity  = p->field[index];
 
   /* update and restore into used */
   entity.setType (getRandomType());
 
-  emit sigCreated (freeSlot);
+  emit sigCreated (indexToCoord (index));
 }
 
 bool PlaygroundFieldControler::select (quint16 a_x, quint16 a_y)
@@ -182,6 +233,10 @@ bool PlaygroundFieldControler::moveTo (quint16 a_x, quint16 a_y)
   auto oldIndex       = coordToIndex (p->selected);
   p->field[oldIndex]  = std::move (p->field[index]);
 
+  /* switch used and free spaces */
+  p->freeIndexes.remove (index);
+  p->freeIndexes << oldIndex;
+
   emit sigMoved (p->selected, current);
   detectLine (current);
   return true;
@@ -200,6 +255,8 @@ void PlaygroundFieldControler::newGame (quint16 a_width, quint16 a_height)
   p->width   = a_width;
   p->height  = a_height;
   clear();
+
+  emit sigNewGame();
 }
 
 void PlaygroundFieldControler::clear()
@@ -207,6 +264,7 @@ void PlaygroundFieldControler::clear()
   /* clear containers */
 
   p->field.clear();
+  p->freeIndexes.clear();
   p->score    = 0;
   p->selected = p->invalid = Position { p->width, p->height };
 
@@ -215,7 +273,12 @@ void PlaygroundFieldControler::clear()
   p->field.reserve (p->height * p->height);
   for (int y = 0; y < p->height; y++)
     for (int x = 0; x < p->height; x++)
+    {
+      p->freeIndexes << coordToIndex (x, y);
       p->field.append (Entity (Entity::Type::Free, x, y));
+    }
+
+  emit sigFieldCreated();
 }
 
 quint16 PlaygroundFieldControler::coordToIndex (Position a_position) const
@@ -228,7 +291,7 @@ quint16 PlaygroundFieldControler::coordToIndex (quint16 a_x, quint16 a_y) const
   return a_x + a_y * p->width;
 }
 
-PlaygroundFieldControler::Position PlaygroundFieldControler::indexToCoord (quint16 a_index) const
+Position PlaygroundFieldControler::indexToCoord (quint16 a_index) const
 {
   return
     Position
@@ -243,13 +306,13 @@ bool PlaygroundFieldControler::invalidSelection() const
   return p->selected == p->invalid;
 }
 
-PlaygroundFieldControler::Position PlaygroundFieldControler::findFreeSlot() const
-{
-  for (quint16 i = 0; i < p->field.size(); i++)
-    if (p->field.at (i).type() == Entity::Type::Free)
-      return indexToCoord (i);
-  return p->invalid;
-}
+// Position PlaygroundFieldControler::findFreeSlot() const
+// {
+//   for (quint16 i = 0; i < p->field.size(); i++)
+//     if (p->field.at (i).type() == Entity::Type::Free)
+//       return indexToCoord (i);
+//   return p->invalid;
+// }
 
 Entity::Type PlaygroundFieldControler::getRandomType()
 {

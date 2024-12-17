@@ -4,8 +4,10 @@
 /* INCLUDES */
 
 #include <QObject>
+#include <QSize>
 
 #include "objects/entity.hpp"
+#include "util/position.hpp"
 
 /****************************************//**
  * @brief Playground Field Controler Class
@@ -22,18 +24,6 @@ class PlaygroundFieldControler : public QObject
    *******************************************/
   /// @{
 protected:
-
-  struct Position
-  {
-    quint16 x, y;
-
-    bool operator==(const Position &a_other)
-    {
-      return x == a_other.x
-          && y == a_other.y;
-    }
-  };
-
   /// @}
 
   /****************************************//**
@@ -61,10 +51,15 @@ public:
   static PlaygroundFieldControler *instance();
   quint32 score() const;
 
-  /* get entity */
+  /* get data */
 
   const Entity &at (quint16 a_x, quint16 a_y) const;
+  const Entity &atIndex (quint16 a_index) const;
   Entity value (quint16 a_x, quint16 a_y) const;
+  Entity valueAtIndex (quint16 a_index) const;
+  quint16 width() const;
+  quint16 height() const;
+  QSize size() const;
 
   /* interact with entities */
 
@@ -78,13 +73,19 @@ public:
   void newGame (quint16 a_width, quint16 a_height);
   void clear();
 
+  /* misc */
+
   quint16 coordToIndex (Position a_position) const;
   quint16 coordToIndex (quint16 a_x, quint16 a_y) const;
   Position indexToCoord (quint16 a_index) const;
+
+protected:
+
   bool invalidSelection() const;
-  Position findFreeSlot() const;
-  static Entity::Type getRandomType();
   void detectLine (Position a_position);
+
+  static Entity::Type getRandomType();
+
   /// @}
 
   /****************************************//**
@@ -98,6 +99,8 @@ signals:
   void sigMoved (Position a_from, Position a_to);
   void sigGotLine (QList<Position> a_positions);
   void sigGameOver();
+  void sigNewGame();
+  void sigFieldCreated();
   void sigScoreChanged (quint32 a_value);
   /// @}
 };
