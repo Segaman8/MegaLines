@@ -123,6 +123,16 @@ QSize PlaygroundFieldControler::size() const
   return QSize { p->width, p->height };
 }
 
+quint16 PlaygroundFieldControler::amount() const
+{
+  return width() * height();
+}
+
+Position PlaygroundFieldControler::selected() const
+{
+  return p->selected;
+}
+
 
 /* interact with entities */
 
@@ -196,8 +206,9 @@ bool PlaygroundFieldControler::select (quint16 a_x, quint16 a_y)
   Position newSelection { a_x, a_y };
   if (p->selected == newSelection)
     {
+      auto unselected = p->selected;
       p->selected = p->invalid;
-      emit sigUnselected();
+      emit sigUnselected (unselected);
       return true;
     }
 
@@ -215,7 +226,7 @@ bool PlaygroundFieldControler::moveTo (quint16 a_x, quint16 a_y)
     return false;
 
   /* fail, if nothing selected */
-  if (invalidSelection())
+  if (_invalidSelection())
     return false;
 
   /* variables */
@@ -238,7 +249,7 @@ bool PlaygroundFieldControler::moveTo (quint16 a_x, quint16 a_y)
   p->freeIndexes << oldIndex;
 
   emit sigMoved (p->selected, current);
-  detectLine (current);
+  _detectLine (current);
   return true;
 }
 
@@ -279,6 +290,7 @@ void PlaygroundFieldControler::clear()
     }
 
   emit sigFieldCreated();
+  emit sigScoreChanged (p->score);
 }
 
 quint16 PlaygroundFieldControler::coordToIndex (Position a_position) const
@@ -301,7 +313,7 @@ Position PlaygroundFieldControler::indexToCoord (quint16 a_index) const
     };
 }
 
-bool PlaygroundFieldControler::invalidSelection() const
+bool PlaygroundFieldControler::_invalidSelection() const
 {
   return p->selected == p->invalid;
 }
@@ -319,7 +331,7 @@ Entity::Type PlaygroundFieldControler::getRandomType()
   return Entity::Type (qrand() % int (Entity::Type::SIZE));
 }
 
-void PlaygroundFieldControler::detectLine (Position a_position)
+void PlaygroundFieldControler::_detectLine (Position a_position)
 {
   /* defines */
 
@@ -440,9 +452,16 @@ void PlaygroundFieldControler::detectLine (Position a_position)
 
     /* send signal */
 
+    _scored();
     emit sigGotLine (std::move (found[i]));
     break;
   }
+}
+
+void PlaygroundFieldControler::_scored()
+{
+  p->score += 10;
+  emit sigScoreChanged (p->score);
 }
 
 /*-----------------------------------------*/

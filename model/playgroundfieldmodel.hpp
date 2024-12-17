@@ -7,6 +7,10 @@
 
 #include "util/position.hpp"
 
+/* DEFINES */
+
+class PlaygroundFieldControler;
+
 /****************************************//**
  * @brief Playground Field Model Class
  * @date 16.12.2024
@@ -37,6 +41,11 @@ public:
    *******************************************/
   /// @{
 public:
+  void attachControler (PlaygroundFieldControler *a_controler);
+  Q_INVOKABLE void attachControler (QVariant a_controler);
+
+protected:
+  void _updateItemAtPos (Position a_pos);
   /// @}
 
   /****************************************//**
@@ -46,9 +55,9 @@ public:
 public slots:
   void slotCreated (Position a_pos);
   void slotSelected (Position a_selection);
-  void slotUnselected();
+  void slotUnselected (Position a_unselection);
   void slotMoved (Position a_from, Position a_to);
-  void slotGotLine (QList<Position> a_positions);
+  void slotGotLine (const QList<Position> &a_positions);
   void slotGameOver();
   void slotNewGame();
   void slotFieldCreated();

@@ -5,6 +5,8 @@
 #include <QQmlContext>
 #include <QQuickWindow>
 
+#include "ctl/playgroundfieldcontroler.hpp"
+#include "model/playgroundfieldmodel.hpp"
 
 /********************************************
  * MAIN
@@ -20,8 +22,12 @@ int main (int argc, char *argv[])
   /* start qml engine */
   QQmlApplicationEngine engine;
 
+  /* register types */
+  qmlRegisterType<PlaygroundFieldModel> ("com.PlaygroundField", 1, 0, "PlaygroundFieldModel");
+
   /* setup qml context */
-  //QQmlContext *ctx  = engine.rootContext();
+  QQmlContext *ctx  = engine.rootContext();
+  ctx->setContextProperty ("fieldControler", PlaygroundFieldControler::instance());
   //ctx->setContextProperty ("bridgeManager", FormBridgeManager::instance());
 
   /* start qml form */

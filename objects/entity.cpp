@@ -47,7 +47,7 @@ void Entity::setType (Type a_value)
     return;
 
   m_type  = Type (a_value);
-  emit sigTypeChanged();
+  //emit sigTypeChanged();
 }
 
 
@@ -63,7 +63,7 @@ void Entity::setX (quint16 a_value)
     return;
 
   m_x  = a_value;
-  emit sigPosChanged();
+  //emit sigPosChanged();
 }
 
 
@@ -79,7 +79,7 @@ void Entity::setY (quint16 a_value)
     return;
 
   m_y  = a_value;
-  emit sigPosChanged();
+  //emit sigPosChanged();
 }
 
 void Entity::setPos (quint16 a_x, quint16 a_y)
@@ -90,7 +90,7 @@ void Entity::setPos (quint16 a_x, quint16 a_y)
 
   m_x = a_x;
   m_y = a_y;
-  emit sigPosChanged();
+  //emit sigPosChanged();
 }
 
 /********************************************

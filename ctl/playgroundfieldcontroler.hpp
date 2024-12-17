@@ -20,10 +20,11 @@ class PlaygroundFieldControler : public QObject
   Q_OBJECT
 
   /****************************************//**
-   * @name DEFINES
+   * @name PROPERTIES
    *******************************************/
   /// @{
-protected:
+  Q_PROPERTY (quint16 width READ width NOTIFY sigNewGame)
+  Q_PROPERTY (quint16 height READ height NOTIFY sigNewGame)
   /// @}
 
   /****************************************//**
@@ -60,6 +61,8 @@ public:
   quint16 width() const;
   quint16 height() const;
   QSize size() const;
+  quint16 amount() const;
+  Position selected() const;
 
   /* interact with entities */
 
@@ -81,8 +84,9 @@ public:
 
 protected:
 
-  bool invalidSelection() const;
-  void detectLine (Position a_position);
+  bool _invalidSelection() const;
+  void _detectLine (Position a_position);
+  void _scored();
 
   static Entity::Type getRandomType();
 
@@ -95,7 +99,7 @@ protected:
 signals:
   void sigCreated (Position a_pos);
   void sigSelected (Position a_selection);
-  void sigUnselected();
+  void sigUnselected (Position a_unselection);
   void sigMoved (Position a_from, Position a_to);
   void sigGotLine (QList<Position> a_positions);
   void sigGameOver();

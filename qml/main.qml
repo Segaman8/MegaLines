@@ -1,9 +1,10 @@
 /* INCLUDES */
 
-import QtQuick 2.12
+import QtQuick 2.0
 import QtQuick.Layouts 1.0
 import QtQuick.Controls 1.0
 import QtQuick.Window 2.12
+import com.PlaygroundField 1.0
 
 /****************************************//**
  * @brief Main Gui Form
@@ -14,7 +15,7 @@ import QtQuick.Window 2.12
 Window {
     id: window
     width: 480
-    height: 960
+    height: 800
     visible: true
     title: "Mega Lines by Segaman"
 
@@ -24,6 +25,16 @@ Window {
     /// @{
 
     property string formName: "MainQml"
+
+    property QtObject internal: QtObject {
+        property real cellSize: window.width / fieldControler.width
+    }
+
+    PlaygroundFieldModel {
+        id: fieldModel
+
+        Component.onCompleted: attachControler (fieldControler);
+    }
 
     /// @}
     /****************************************//**
@@ -43,9 +54,40 @@ Window {
      ********************************************/
     /// @{
 
+    Component {
+        id: compCell
+
+        Rectangle {
+            width:  window.internal.cellSize
+            height: window.internal.cellSize
+            radius: height
+            color: {
+                var colorSet =
+                [
+                    "#a00",
+                    "#00a",
+                    "#0a0",
+                    "#aa0",
+                    "#333",
+                ];
+                return colorSet[model.type];
+            }
+        }
+    }
+
     /// @}
     /****************************************//**
      * Content
      ********************************************/
 
+    GridView {
+        anchors.centerIn: parent
+        width: window.width
+        height: window.width
+
+        model: fieldModel
+        delegate: compCell
+    }
 }
+
+/*-----------------------------------------*/

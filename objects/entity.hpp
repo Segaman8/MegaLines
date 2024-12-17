@@ -11,19 +11,8 @@
  * @authors Segaman
  *******************************************/
 
-class Entity : public QObject
+class Entity
 {
-  Q_OBJECT
-
-  /****************************************//**
-   * @name PROPERTIES
-   *******************************************/
-  /// @{
-  Q_PROPERTY (Type type READ type WRITE setType NOTIFY sigTypeChanged)
-  Q_PROPERTY (quint16 x READ x WRITE setX NOTIFY sigPosChanged)
-  Q_PROPERTY (quint16 y READ y WRITE setY NOTIFY sigPosChanged)
-  /// @}
-
   /****************************************//**
    * @name DEFINES
    *******************************************/
@@ -41,7 +30,6 @@ public:
 
     Free = SIZE,
   };
-  Q_ENUM (Type)
 
   /// @}
 
@@ -80,15 +68,6 @@ public:
   void setY (quint16 a_value);
 
   void setPos (quint16 a_x, quint16 a_y);
-  /// @}
-
-  /****************************************//**
-   * @name SIGNALS
-   *******************************************/
-  /// @{
-signals:
-  void sigTypeChanged();
-  void sigPosChanged();
   /// @}
 
   /****************************************//**
