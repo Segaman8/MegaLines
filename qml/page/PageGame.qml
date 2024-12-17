@@ -24,6 +24,7 @@ Item {
 
     property QtObject internal: QtObject {
         property real cellSize: root.width / fieldControler.width
+        property int score: 0
     }
 
     PlaygroundFieldModel {
@@ -38,13 +39,19 @@ Item {
      ********************************************/
     /// @{
 
-    Component.onCompleted: bridgeManager.connectQmlForm (window);
+    signal sigEntityClicked (int a_index);
+
+    Component.onCompleted: bridgeManager.connectQmlForm (root);
 
     /// @}
     /****************************************//**
      * @name FUNCTIONS
      ********************************************/
     /// @{
+
+    function slotScoreUpdate (a_value) {
+        root.internal.score = a_value;
+    }
 
     /// @}
     /****************************************//**
@@ -70,6 +77,11 @@ Item {
                 ];
                 return colorSet[model.type];
             }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: root.sigEntityClicked (model.index);
+            }
         }
     }
 
@@ -77,6 +89,21 @@ Item {
     /****************************************//**
      * Content
      ********************************************/
+
+    /* score */
+
+    Text {
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.topMargin: 12
+        anchors.rightMargin: 20
+
+        font.pixelSize: 14
+        text: `Score: ${root.internal.score}`
+        color: "#ddd"
+    }
+
+    /* play field */
 
     GridView {
         anchors.centerIn: parent

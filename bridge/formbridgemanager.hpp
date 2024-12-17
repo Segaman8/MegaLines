@@ -36,6 +36,7 @@ public:
 
   Q_INVOKABLE void connectQmlForm (QObject *a_qmlForm);
   static FormBridgeBase *mainQml();
+  static FormBridgeBase *pageGame();
   /// @}
 };
 
