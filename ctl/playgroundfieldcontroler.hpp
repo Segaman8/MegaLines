@@ -66,8 +66,8 @@ public:
 
   /* interact with entities */
 
-  void createAt (quint16 a_x, quint16 a_y, Entity::Type a_type);
-  void createRandom();
+  bool createAt (quint16 a_x, quint16 a_y, Entity::Type a_type);
+  bool createRandom();
   bool select (quint16 a_x, quint16 a_y);
   bool moveTo (quint16 a_x, quint16 a_y);
 
@@ -87,6 +87,7 @@ protected:
   bool _invalidSelection() const;
   void _detectLine (Position a_position);
   void _scored();
+  void _destroyEntities (const QList<Position> &a_positions);
 
   static Entity::Type getRandomType();
 

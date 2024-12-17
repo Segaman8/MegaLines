@@ -137,12 +137,12 @@ Position PlaygroundFieldControler::selected() const
 /* interact with entities */
 
 
-void PlaygroundFieldControler::createAt (quint16 a_x, quint16 a_y, Entity::Type a_type)
+bool PlaygroundFieldControler::createAt (quint16 a_x, quint16 a_y, Entity::Type a_type)
 {
   /* check boundaries */
   if (a_x >= p->width
       || a_y >= p->height)
-    return;
+    return false;
 
   /* variables */
   auto index    = coordToIndex (a_x, a_y);
@@ -150,7 +150,7 @@ void PlaygroundFieldControler::createAt (quint16 a_x, quint16 a_y, Entity::Type 
 
   /* check if free */
   if (entity.type() != Entity::Type::Free)
-    return;
+    return false;
 
   /* remove from free set */
   p->freeIndexes.remove (index);
@@ -159,13 +159,17 @@ void PlaygroundFieldControler::createAt (quint16 a_x, quint16 a_y, Entity::Type 
   entity.setType (a_type);
 
   emit sigCreated ({ a_x, a_y });
+  return true;
 }
 
-void PlaygroundFieldControler::createRandom()
+bool PlaygroundFieldControler::createRandom()
 {
   /* check if no free left */
   if (p->freeIndexes.size() == 0)
-    return emit sigGameOver();
+  {
+    emit sigGameOver();
+    return false;
+  }
 
   /* variables */
   quint16 index;
@@ -185,6 +189,9 @@ void PlaygroundFieldControler::createRandom()
   entity.setType (getRandomType());
 
   emit sigCreated (indexToCoord (index));
+  if (p->freeIndexes.size() == 0)
+    emit sigGameOver();
+  return true;
 }
 
 bool PlaygroundFieldControler::select (quint16 a_x, quint16 a_y)
@@ -249,7 +256,9 @@ bool PlaygroundFieldControler::moveTo (quint16 a_x, quint16 a_y)
   p->freeIndexes.remove (index);
   p->freeIndexes << oldIndex;
 
-  emit sigMoved (p->selected, current);
+  auto movedItem  = p->selected;
+  p->selected = p->invalid;
+  emit sigMoved (movedItem, current);
   _detectLine (current);
   return true;
 }
@@ -372,7 +381,8 @@ void PlaygroundFieldControler::_detectLine (Position a_position)
   auto searchForItems =
     [this, a_position, &counter, &found, desiredType] (
       qint16 a_horAccel,
-      qint16 a_verAccel)
+      qint16 a_verAccel,
+      int a_category)
   {
     /* variables */
     Position position
@@ -393,7 +403,7 @@ void PlaygroundFieldControler::_detectLine (Position a_position)
         return;
 
       /* found */
-      found[Direction::DiagonalLeft].append (position);
+      found[a_category].append (position);
       counter++;
 
       /* apply accel */
@@ -407,33 +417,33 @@ void PlaygroundFieldControler::_detectLine (Position a_position)
     /* Horizontal */
     [&counter, searchForItems]()
     {
-      counter = 0;
-      searchForItems (-1, 0);
-      searchForItems (1, 0);
+      counter = 1;
+      searchForItems (-1, 0, Direction::Horizontal);
+      searchForItems (1, 0, Direction::Horizontal);
     },
 
     /* Vertical */
     [&counter, searchForItems]()
     {
-      counter = 0;
-      searchForItems (0, -1);
-      searchForItems (0, 1);
+      counter = 1;
+      searchForItems (0, -1, Direction::Vertical);
+      searchForItems (0, 1, Direction::Vertical);
     },
 
     /* DiagonalLeft */
     [&counter, searchForItems]()
     {
-      counter = 0;
-      searchForItems (-1, -1);
-      searchForItems (1, 1);
+      counter = 1;
+      searchForItems (-1, -1, Direction::DiagonalLeft);
+      searchForItems (1, 1, Direction::DiagonalLeft);
     },
 
     /* DiagonalRight */
     [&counter, searchForItems]()
     {
-      counter = 0;
-      searchForItems (1, -1);
-      searchForItems (-1, 1);
+      counter = 1;
+      searchForItems (1, -1, Direction::DiagonalRight);
+      searchForItems (-1, 1, Direction::DiagonalRight);
     },
   };
 
@@ -454,6 +464,7 @@ void PlaygroundFieldControler::_detectLine (Position a_position)
     /* send signal */
 
     _scored();
+    _destroyEntities (found[i]);
     emit sigGotLine (std::move (found[i]));
     break;
   }
@@ -463,6 +474,16 @@ void PlaygroundFieldControler::_scored()
 {
   p->score += 10;
   emit sigScoreChanged (p->score);
+}
+
+void PlaygroundFieldControler::_destroyEntities (const QList<Position> &a_positions)
+{
+  for (auto &pos : a_positions)
+  {
+    auto index  = coordToIndex (pos);
+    p->field[index].setType (Entity::Type::Free);
+    p->freeIndexes << index;
+  }
 }
 
 /*-----------------------------------------*/

@@ -24,18 +24,12 @@ BridgePageGame::BridgePageGame (QObject *a_parent)
   auto ctl  = PlaygroundFieldControler::instance();
 
   /* connect signals */
-  connect (ctl, &PlaygroundFieldControler::sigScoreChanged,
-           this, [this] (quint32 a_value)
-  {
-    emit sigScoreUpdate (a_value);
-  });
+  FormBridgeBase::connectSignalsAndSlots (ctl);
+  // connect (ctl, &PlaygroundFieldControler::sigScoreChanged,
+  //          this, &BridgePageGame::slotScoreChanged);
 
-  connect (ctl, &PlaygroundFieldControler::sigNewGame,
-           this, [this] ()
-  {
-    s_selected  = false;
-    emit sigScoreUpdate (0);
-  });
+  // connect (ctl, &PlaygroundFieldControler::sigNewGame,
+  //          this, &BridgePageGame::slotNewGame);
 }
 
 BridgePageGame::~BridgePageGame()
@@ -64,12 +58,34 @@ void BridgePageGame::_spawnNewEntities()
   auto ctl  = PlaygroundFieldControler::instance();
 
   for (int i = 0; i < 3; i++)
-    ctl->createRandom();
+    if (!ctl->createRandom())
+      return;
 }
 
 /********************************************
  * SLOTS
  *******************************************/
+
+void BridgePageGame::slotScoreChanged (quint32 a_value)
+{
+  emit sigScoreUpdate (a_value);
+}
+
+void BridgePageGame::slotNewGame()
+{
+  s_selected  = false;
+  emit sigScoreUpdate (0);
+}
+
+void BridgePageGame::slotGameOver()
+{
+  DEBUGINFO;
+}
+
+void BridgePageGame::slotGotLine (QList<Position> a_positions)
+{
+  DEBUGINFO;
+}
 
 void BridgePageGame::slotEntityClicked (int a_index)
 {

@@ -4,6 +4,7 @@
 /* INCLUDES */
 
 #include "formbridgebase.hpp"
+#include "util/position.hpp"
 
 /****************************************//**
  * @brief Bridge for PageGame
@@ -40,7 +41,7 @@ protected:
    *******************************************/
   /// @{
 signals:
-  void sigScoreUpdate (int a_score);
+  void sigScoreUpdate (QVariant a_score);
   /// @}
 
   /****************************************//**
@@ -48,6 +49,16 @@ signals:
    *******************************************/
   /// @{
 public slots:
+
+  /* Field */
+
+  void slotScoreChanged (quint32 a_value);
+  void slotNewGame();
+  void slotGameOver();
+  void slotGotLine (QList<Position> a_positions);
+
+  /* GUI */
+
   void slotEntityClicked (int a_index);
   /// @}
 };
