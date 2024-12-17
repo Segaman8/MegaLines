@@ -9,8 +9,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt5 REQUIRED COMPONENTS Core Quick)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick)
+find_package(QT NAMES Qt5 REQUIRED COMPONENTS Core Quick Sql)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Sql)
 
 set(PROJECT_SOURCES
   main.cpp
@@ -20,6 +20,7 @@ set(PROJECT_SOURCES
   bridge/bridgemain.cpp
   bridge/bridgepagegame.cpp
 
+  ctl/gamestoragecontroler.cpp
   ctl/playgroundfieldcontroler.cpp
 
   model/playgroundfieldmodel.cpp
@@ -33,6 +34,7 @@ set(PROJECT_HEADERS
   bridge/bridgemain.hpp
   bridge/bridgepagegame.hpp
 
+  ctl/gamestoragecontroler.hpp
   ctl/playgroundfieldcontroler.hpp
 
   model/playgroundfieldmodel.hpp
@@ -64,7 +66,9 @@ target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE
   Qt${QT_VERSION_MAJOR}::Core
-  Qt${QT_VERSION_MAJOR}::Quick)
+  Qt${QT_VERSION_MAJOR}::Quick
+  Qt${QT_VERSION_MAJOR}::Sql
+)
 
 include(GNUInstallDirs)
 install(TARGETS ${PROJECT_NAME}

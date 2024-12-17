@@ -57,9 +57,13 @@ Window {
      * Content
      ********************************************/
 
-    PageGame {
+    PageTitle {
         anchors.fill: parent
     }
+
+    // PageGame {
+    //     anchors.fill: parent
+    // }
 }
 
 /*-----------------------------------------*/

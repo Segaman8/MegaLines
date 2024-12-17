@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>qml/main.qml</file>
         <file>qml/page/PageGame.qml</file>
+        <file>qml/page/PageTitle.qml</file>
     </qresource>
 </RCC>
