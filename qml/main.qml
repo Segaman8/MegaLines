@@ -29,6 +29,7 @@ Window {
 
     property string formName: "MainQml"
 
+    property int tab: 0
     property QtObject internal: QtObject {
     }
 
@@ -59,11 +60,13 @@ Window {
 
     PageTitle {
         anchors.fill: parent
+        visible: tab === 0
     }
 
-    // PageGame {
-    //     anchors.fill: parent
-    // }
+    PageGame {
+        anchors.fill: parent
+        visible: tab === 1
+    }
 }
 
 /*-----------------------------------------*/

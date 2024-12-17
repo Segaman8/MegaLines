@@ -2,6 +2,7 @@
 
 #include "bridgemain.hpp"
 
+#include <QQuickWindow>
 #include <QDebug>
 
 /* DEFINES */
@@ -56,6 +57,12 @@ QQuickWindow *BridgeMain::window() const
 void BridgeMain::setWindow (QQuickWindow *a_window)
 {
   s_window  = a_window;
+}
+
+void BridgeMain::switchToTab (int a_tab)
+{
+  if (s_window)
+    s_window->setProperty ("tab", a_tab);
 }
 
 /********************************************

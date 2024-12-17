@@ -4,6 +4,7 @@
 
 #include "bridgemain.hpp"
 #include "bridgepagegame.hpp"
+#include "bridgepagetitle.hpp"
 
 #include <QVariant>
 
@@ -13,6 +14,7 @@ struct Bridges
 {
   BridgeMain        mainQml;
   BridgePageGame    pageGame;
+  BridgePageTitle   pageTitle;
 };
 
 static QHash<QString, FormBridgeBase*> s_bridgesMap;
@@ -35,6 +37,7 @@ FormBridgeManager::FormBridgeManager()
   /* build a bridge map */
   pushBridge (s_bridges->mainQml);
   pushBridge (s_bridges->pageGame);
+  pushBridge (s_bridges->pageTitle);
 
   /* connect some bridges to each other */
   //s_bridges->projects.connectMainQml (&s_bridges->mainQml);
@@ -67,6 +70,11 @@ FormBridgeBase *FormBridgeManager::mainQml()
 FormBridgeBase *FormBridgeManager::pageGame()
 {
   return &s_bridges->pageGame;
+}
+
+FormBridgeBase *FormBridgeManager::pageTitle()
+{
+  return &s_bridges->pageTitle;
 }
 
 /*-----------------------------------------*/

@@ -36,6 +36,8 @@ Item {
     signal sigNewGameClicked();
     signal sigQuitClicked();
 
+    Component.onCompleted: bridgeManager.connectQmlForm (root);
+
     /// @}
     /****************************************//**
      * @name FUNCTIONS
@@ -168,7 +170,7 @@ Item {
             sourceComponent: compButton
             property string text: "Continue"
             property var onClicked: function() {
-                console.log(`${text} clicked!`);
+                //console.log(`${text} clicked!`);
                 root.sigContinueClicked();
             }
         }
@@ -179,7 +181,7 @@ Item {
             sourceComponent: compButton
             property string text: "New Game"
             property var onClicked: function() {
-                console.log(`${text} clicked!`);
+                //console.log(`${text} clicked!`);
                 root.sigNewGameClicked();
             }
         }
@@ -190,7 +192,7 @@ Item {
             sourceComponent: compButton
             property string text: "Quit"
             property var onClicked: function() {
-                console.log(`${text} clicked!`);
+                //console.log(`${text} clicked!`);
                 root.sigQuitClicked();
             }
         }

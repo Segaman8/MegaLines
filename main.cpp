@@ -6,6 +6,7 @@
 #include <QQuickWindow>
 
 #include "bridge/formbridgemanager.hpp"
+#include "bridge/bridgemain.hpp"
 #include "ctl/playgroundfieldcontroler.hpp"
 #include "model/playgroundfieldmodel.hpp"
 
@@ -44,7 +45,8 @@ int main (int argc, char *argv[])
     QQuickWindow *qmlWindow = qobject_cast<QQuickWindow *> (engine.rootObjects().first());
     if (qmlWindow)
       {
-
+        auto mainQml  = FormBridgeManager::mainQml()->as<BridgeMain>();
+        mainQml->setWindow (qmlWindow);
       }
   });
   engine.load (url);

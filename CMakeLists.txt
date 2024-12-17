@@ -19,6 +19,7 @@ set(PROJECT_SOURCES
   bridge/formbridgemanager.cpp
   bridge/bridgemain.cpp
   bridge/bridgepagegame.cpp
+  bridge/bridgepagetitle.cpp
 
   ctl/gamestoragecontroler.cpp
   ctl/playgroundfieldcontroler.cpp
@@ -33,6 +34,7 @@ set(PROJECT_HEADERS
   bridge/formbridgemanager.hpp
   bridge/bridgemain.hpp
   bridge/bridgepagegame.hpp
+  bridge/bridgepagetitle.hpp
 
   ctl/gamestoragecontroler.hpp
   ctl/playgroundfieldcontroler.hpp

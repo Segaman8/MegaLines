@@ -57,7 +57,7 @@ public:
   }
 
   template<class T>
-  T *as () const
+  T *as ()
   {
     return dynamic_cast<T*> (this);
   }

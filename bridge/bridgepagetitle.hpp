@@ -1,22 +1,17 @@
-#ifndef BRIDGEMAIN_H
-#define BRIDGEMAIN_H
+#ifndef BRIDGEPAGETITLE_HPP
+#define BRIDGEPAGETITLE_HPP
 
 /* INCLUDES */
 
 #include "formbridgebase.hpp"
-#include <QVariant>
-
-/* DEFINES */
-
-QT_FORWARD_DECLARE_CLASS(QQuickWindow)
 
 /****************************************//**
- * @brief Bridge for main.qml
+ * @brief Bridge for PageTitle
  * @date 17.12.2024
  * @authors Segaman
  *******************************************/
 
-class BridgeMain : public FormBridgeBase
+class BridgePageTitle : public FormBridgeBase
 {
   Q_OBJECT
 
@@ -25,8 +20,8 @@ class BridgeMain : public FormBridgeBase
    *******************************************/
   /// @{
 public:
-  explicit BridgeMain (QObject *a_parent = nullptr);
-  ~BridgeMain();
+  explicit BridgePageTitle (QObject *a_parent = nullptr);
+  ~BridgePageTitle();
   /// @}
 
   /****************************************//**
@@ -36,11 +31,6 @@ public:
 public:
   void connectSignalsAndSlots (QObject *a_qmlForm);
   QString formName() const;
-
-  QQuickWindow *window() const;
-  void setWindow (QQuickWindow *a_window);
-
-  void switchToTab (int a_tab);
   /// @}
 
   /****************************************//**
@@ -55,8 +45,11 @@ signals:
    *******************************************/
   /// @{
 public slots:
+  void slotContinueClicked();
+  void slotNewGameClicked();
+  void slotQuitClicked();
   /// @}
 };
 
 /*-----------------------------------------*/
-#endif // BRIDGEMAIN_H
+#endif // BRIDGEPAGETITLE_HPP
