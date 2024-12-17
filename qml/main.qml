@@ -18,6 +18,7 @@ Window {
     height: 800
     visible: true
     title: "Mega Lines by Segaman"
+    color: "#333"
 
     /****************************************//**
      * @name VARIABLES
@@ -68,7 +69,7 @@ Window {
                     "#00a",
                     "#0a0",
                     "#aa0",
-                    "#333",
+                    "#444",
                 ];
                 return colorSet[model.type];
             }
@@ -84,6 +85,8 @@ Window {
         anchors.centerIn: parent
         width: window.width
         height: window.width
+        cellWidth: window.internal.cellSize
+        cellHeight: window.internal.cellSize
 
         model: fieldModel
         delegate: compCell

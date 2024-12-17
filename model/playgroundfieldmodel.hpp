@@ -17,8 +17,10 @@ class PlaygroundFieldControler;
  * @authors Segaman
  *******************************************/
 
-class PlaygroundFieldModel : public QAbstractItemModel
+class PlaygroundFieldModel : public QAbstractTableModel
 {
+  Q_OBJECT
+
   /****************************************//**
    * @name VARIABLES
    *******************************************/

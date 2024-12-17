@@ -33,7 +33,7 @@ static QHash<int, QByteArray> s_roles =
  *******************************************/
 
 PlaygroundFieldModel::PlaygroundFieldModel (QObject *a_parent)
-  : QAbstractItemModel (a_parent)
+  : QAbstractTableModel (a_parent)
   , p (new Private)
 {
 
@@ -52,6 +52,8 @@ void PlaygroundFieldModel::attachControler (PlaygroundFieldControler *a_controle
 {
   if (a_controler == nullptr)
     return;
+
+  beginResetModel();
 
   p->controler  = a_controler;
 
@@ -73,6 +75,8 @@ void PlaygroundFieldModel::attachControler (PlaygroundFieldControler *a_controle
            this, &PlaygroundFieldModel::slotFieldCreated);
   connect (a_controler, &PlaygroundFieldControler::sigScoreChanged ,
            this, &PlaygroundFieldModel::slotScoreChanged);
+
+  endResetModel();
 }
 
 void PlaygroundFieldModel::attachControler (QVariant a_controler)
