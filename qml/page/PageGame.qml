@@ -23,7 +23,9 @@ Item {
     property string formName: "PageGame"
 
     property QtObject internal: QtObject {
-        property real cellSize: root.width / fieldControler.width
+        property bool landscape: root.height < root.width
+        property real fieldSize: landscape ? root.height : root.width
+        property real cellSize: fieldSize / fieldControler.width
         property int score: 0
     }
 
@@ -99,6 +101,7 @@ Item {
         anchors.right: parent.right
         anchors.topMargin: 12
         anchors.rightMargin: 20
+        z: 20
 
         font.pixelSize: 14
         text: `Score: ${root.internal.score}`
@@ -108,9 +111,12 @@ Item {
     /* play field */
 
     GridView {
-        anchors.centerIn: parent
-        width: root.width
-        height: root.width
+        y: root.internal.landscape
+         ? 0
+         : (root.height - height) / 2
+        z: 10
+        width: root.internal.fieldSize
+        height: root.internal.fieldSize
         cellWidth: root.internal.cellSize
         cellHeight: root.internal.cellSize
 

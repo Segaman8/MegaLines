@@ -1,4 +1,6 @@
 <RCC>
     <qresource prefix="/">
+        <file>assets/GameOver.png</file>
+        <file>assets/MegaLines.png</file>
     </qresource>
 </RCC>
