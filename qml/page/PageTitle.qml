@@ -22,6 +22,7 @@ Item {
 
     property QtObject internal: QtObject {
         readonly property real titleAnimAngle: 3.125
+        readonly property real buttonHeight: 64
         property bool landscape: root.height < root.width
     }
 
@@ -30,6 +31,10 @@ Item {
      * @name SIGNALS
      ********************************************/
     /// @{
+
+    signal sigContinueClicked();
+    signal sigNewGameClicked();
+    signal sigQuitClicked();
 
     /// @}
     /****************************************//**
@@ -43,6 +48,50 @@ Item {
      ********************************************/
     /// @{
 
+    Component {
+        id: compButton
+
+        // property string text
+        // property var onClicked
+
+        Rectangle {
+            id: compButtonRoot
+            anchors.fill: parent
+            z: 10
+            color: hovered ? "#666" : "#555"
+            radius: height * 0.125
+
+            property bool hovered: false
+
+            Rectangle {
+                anchors.fill: parent
+                anchors.bottomMargin: parent.height / 2
+                z: 20
+                radius: parent.radius
+                color: "#eee"
+                opacity: compButtonRoot.hovered ? 0.175 : 0.125
+            }
+
+            Text {
+                anchors.fill: parent
+                z: 30
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 20
+                text: compButtonRoot.parent.text
+                color: "#eee"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: compButtonRoot.parent.onClicked();
+                onEntered: compButtonRoot.hovered = true;
+                onExited:  compButtonRoot.hovered = false;
+            }
+        }
+    }
+
     /// @}
     /****************************************//**
      * Content
@@ -51,6 +100,7 @@ Item {
     /* title image */
 
     Image {
+        id: titleImage
         x: root.internal.landscape
          ? width * 0.05
          : (root.width - width) / 2
@@ -66,8 +116,8 @@ Item {
 
         transform: Rotation {
             id: titleRotation
-            origin.x: width / 2
-            origin.y: height / 2
+            origin.x: titleImage.width / 2
+            origin.y: titleImage.height / 2
             angle: 0
         }
 
@@ -94,6 +144,54 @@ Item {
                     to   = root.internal.titleAnimAngle;
                     start();
                 }
+            }
+        }
+    }
+
+    /* controls */
+
+    ColumnLayout {
+        x: root.internal.landscape
+         ? root.width * 0.575
+         : (root.width - width) / 2
+        y: root.internal.landscape
+         ? (root.height - height) / 2
+         : titleImage.height
+        width: root.internal.landscape
+             ? root.width * 0.375
+             : root.width * 0.75
+        height: root.internal.buttonHeight * 3
+
+        Loader {
+            Layout.fillWidth: true
+            Layout.preferredHeight: root.internal.buttonHeight
+            sourceComponent: compButton
+            property string text: "Continue"
+            property var onClicked: function() {
+                console.log(`${text} clicked!`);
+                root.sigContinueClicked();
+            }
+        }
+
+        Loader {
+            Layout.fillWidth: true
+            Layout.preferredHeight: root.internal.buttonHeight
+            sourceComponent: compButton
+            property string text: "New Game"
+            property var onClicked: function() {
+                console.log(`${text} clicked!`);
+                root.sigNewGameClicked();
+            }
+        }
+
+        Loader {
+            Layout.fillWidth: true
+            Layout.preferredHeight: root.internal.buttonHeight
+            sourceComponent: compButton
+            property string text: "Quit"
+            property var onClicked: function() {
+                console.log(`${text} clicked!`);
+                root.sigQuitClicked();
             }
         }
     }
