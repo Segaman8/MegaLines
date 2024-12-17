@@ -141,7 +141,8 @@ bool PlaygroundFieldControler::createAt (quint16 a_x, quint16 a_y, Entity::Type 
 {
   /* check boundaries */
   if (a_x >= p->width
-      || a_y >= p->height)
+      || a_y >= p->height
+      || a_type == Entity::Type::Free)
     return false;
 
   /* variables */

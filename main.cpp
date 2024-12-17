@@ -32,8 +32,6 @@ int main (int argc, char *argv[])
   ctx->setContextProperty ("fieldControler", PlaygroundFieldControler::instance());
   ctx->setContextProperty ("bridgeManager", FormBridgeManager::instance());
 
-  PlaygroundFieldControler::instance()->createRandom();
-
   /* start qml form */
   const QUrl url (QStringLiteral ("qrc:/qml/main.qml"));
   QObject::connect (&engine, &QQmlApplicationEngine::objectCreated,

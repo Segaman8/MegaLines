@@ -5,6 +5,7 @@
 #include "formbridgemanager.hpp"
 
 #include "ctl/gamestoragecontroler.hpp"
+#include "ctl/playgroundfieldcontroler.hpp"
 
 #include <QGuiApplication>
 #include <QDebug>
@@ -64,7 +65,15 @@ void BridgePageTitle::slotNewGameClicked()
   DEBUGINFO;
 
   /* variables */
+  auto ctl      = PlaygroundFieldControler::instance();
   auto mainQml  = FormBridgeManager::mainQml()->as<BridgeMain>();
+
+  /* start new game */
+  ctl->newGame (9, 9);
+
+  /* create random entities */
+  for (int i = 0; i < 3; i++)
+    ctl->createRandom();
 
   /* start game */
   mainQml->switchToTab (1);
