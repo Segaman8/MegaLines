@@ -6,30 +6,30 @@ import QtQuick.Controls 1.0
 import QtQuick.Window 2.12
 import com.PlaygroundField 1.0
 
-import "page"
-
 /****************************************//**
- * @brief Main Gui Form
- * @date 16.12.24
+ * @brief Page Game Form
+ * @date 17.12.24
  * @author Segaman
  *******************************************/
 
-Window {
-    id: window
-    width: 480
-    height: 800
-    visible: false
-    title: "Mega Lines by Segaman"
-    color: "#333"
+Item {
+    id: root
 
     /****************************************//**
      * @name VARIABLES
      ********************************************/
     /// @{
 
-    property string formName: "MainQml"
+    property string formName: "PageGame"
 
     property QtObject internal: QtObject {
+        property real cellSize: root.width / fieldControler.width
+    }
+
+    PlaygroundFieldModel {
+        id: fieldModel
+
+        Component.onCompleted: attachControler (fieldControler);
     }
 
     /// @}
@@ -52,13 +52,41 @@ Window {
      ********************************************/
     /// @{
 
+    Component {
+        id: compCell
+
+        Rectangle {
+            width:  root.internal.cellSize
+            height: root.internal.cellSize
+            radius: height
+            color: {
+                var colorSet =
+                [
+                    "#a00",
+                    "#00a",
+                    "#0a0",
+                    "#aa0",
+                    "#444",
+                ];
+                return colorSet[model.type];
+            }
+        }
+    }
+
     /// @}
     /****************************************//**
      * Content
      ********************************************/
 
-    PageGame {
-        anchors.fill: parent
+    GridView {
+        anchors.centerIn: parent
+        width: root.width
+        height: root.width
+        cellWidth: root.internal.cellSize
+        cellHeight: root.internal.cellSize
+
+        model: fieldModel
+        delegate: compCell
     }
 }
 

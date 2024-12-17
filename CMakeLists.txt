@@ -15,6 +15,10 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick)
 set(PROJECT_SOURCES
   main.cpp
 
+  bridge/formbridgebase.cpp
+  bridge/formbridgemanager.cpp
+  bridge/bridgemain.cpp
+
   ctl/playgroundfieldcontroler.cpp
 
   model/playgroundfieldmodel.cpp
@@ -23,6 +27,10 @@ set(PROJECT_SOURCES
 )
 
 set(PROJECT_HEADERS
+  bridge/formbridgebase.hpp
+  bridge/formbridgemanager.hpp
+  bridge/bridgemain.hpp
+
   ctl/playgroundfieldcontroler.hpp
 
   model/playgroundfieldmodel.hpp

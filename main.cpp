@@ -5,6 +5,7 @@
 #include <QQmlContext>
 #include <QQuickWindow>
 
+#include "bridge/formbridgemanager.hpp"
 #include "ctl/playgroundfieldcontroler.hpp"
 #include "model/playgroundfieldmodel.hpp"
 
@@ -28,7 +29,9 @@ int main (int argc, char *argv[])
   /* setup qml context */
   QQmlContext *ctx  = engine.rootContext();
   ctx->setContextProperty ("fieldControler", PlaygroundFieldControler::instance());
-  //ctx->setContextProperty ("bridgeManager", FormBridgeManager::instance());
+  ctx->setContextProperty ("bridgeManager", FormBridgeManager::instance());
+
+  PlaygroundFieldControler::instance()->createRandom();
 
   /* start qml form */
   const QUrl url (QStringLiteral ("qrc:/qml/main.qml"));

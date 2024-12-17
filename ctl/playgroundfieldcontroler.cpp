@@ -172,7 +172,7 @@ void PlaygroundFieldControler::createRandom()
 
   /* get free index */
   {
-    quint16 freeIndexInt  = qrand() % p->freeIndexes.size();
+    quint16 freeIndexInt  = QRandomGenerator::global()->generate() % p->freeIndexes.size();
     auto freeIndex        = p->freeIndexes.begin() + freeIndexInt;
     index                 = *freeIndex;
     p->freeIndexes.erase (freeIndex);
@@ -328,7 +328,7 @@ bool PlaygroundFieldControler::_invalidSelection() const
 
 Entity::Type PlaygroundFieldControler::getRandomType()
 {
-  return Entity::Type (qrand() % int (Entity::Type::SIZE));
+  return Entity::Type (QRandomGenerator::global()->generate() % int (Entity::Type::SIZE));
 }
 
 void PlaygroundFieldControler::_detectLine (Position a_position)
