@@ -77,6 +77,8 @@ Item {
                 ];
                 return colorSet[model.type];
             }
+            border.width: model.selected * 2
+            border.color: "#eee"
 
             MouseArea {
                 anchors.fill: parent

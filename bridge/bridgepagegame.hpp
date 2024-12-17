@@ -31,6 +31,8 @@ public:
 public:
   void connectSignalsAndSlots (QObject *a_qmlForm);
   QString formName() const;
+protected:
+  void _spawnNewEntities();
   /// @}
 
   /****************************************//**

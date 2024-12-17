@@ -242,7 +242,8 @@ bool PlaygroundFieldControler::moveTo (quint16 a_x, quint16 a_y)
 
   /* move */
   auto oldIndex       = coordToIndex (p->selected);
-  p->field[oldIndex]  = std::move (p->field[index]);
+  p->field[index].setType (p->field[oldIndex].type());
+  p->field[oldIndex].setType (Entity::Type::Free);
 
   /* switch used and free spaces */
   p->freeIndexes.remove (index);
