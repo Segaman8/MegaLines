@@ -51,6 +51,7 @@ protected:
 public:
   static PlaygroundFieldControler *instance();
   quint32 score() const;
+  void setScore (quint32 a_value);
 
   /* get data */
 

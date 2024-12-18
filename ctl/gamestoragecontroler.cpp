@@ -17,12 +17,13 @@
 struct DatabaseControler
 {
   /* VARIABLES */
-  QSqlDatabase db;
+  static QSqlDatabase db;
 
   /* CONSTRUCT/DESTRUCT */
   DatabaseControler()
-    : db (QSqlDatabase::addDatabase ("QSQLITE"))
   {
+    if (!db.isValid())
+      db  = QSqlDatabase::addDatabase ("QSQLITE");
     db.setDatabaseName (DATABASE_NAME);
 
     if (!db.open())
@@ -41,6 +42,10 @@ struct DatabaseControler
   void storeGameData();
   void restoreGameData();
 };
+
+/* VARIABLES */
+
+QSqlDatabase DatabaseControler::db;
 
 /********************************************
  * CONSTRUCT/DESTRUCT
@@ -197,6 +202,9 @@ void DatabaseControler::restoreGameData()
                    .arg (width)
                    .arg (height)
                    .arg (score);
+
+      ctl->newGame (width, height);
+      ctl->setScore (score);
 
       success = true;
     }

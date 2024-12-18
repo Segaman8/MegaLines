@@ -58,6 +58,15 @@ quint32 PlaygroundFieldControler::score() const
   return p->score;
 }
 
+void PlaygroundFieldControler::setScore (quint32 a_value)
+{
+  if (p->score == a_value)
+    return;
+
+  p->score  = a_value;
+  emit sigScoreChanged (p->score);
+}
+
 
 /* get entity */
 
