@@ -77,7 +77,7 @@ Item {
 
             Rectangle {
                 anchors.fill: parent
-                anchors.margins: parent.height * 0.025
+                anchors.margins: margin
                 radius: height
                 color: {
                     var colorSet =
@@ -88,11 +88,22 @@ Item {
                         "#aa0",
                         "#444",
                     ];
-                    return colorSet[model.type];
+                    return colorSet[type];
                 }
                 border.width: model.selected * 2
                 border.color: "#eee"
-                visible: model.type < 4
+
+                property int type: model.type
+                property real margin: type < 4
+                                    ? parent.height * 0.025
+                                    : parent.height
+
+                Behavior on margin {
+                    PropertyAnimation {
+                        id: marginAnim
+                        duration: 125
+                    }
+                }
 
                 Rectangle {
                     anchors.fill: parent
@@ -102,6 +113,10 @@ Item {
                     color: "#eee"
                     radius: height
                     opacity: 0.25
+                }
+
+                onTypeChanged: {
+                    marginAnim.duration = type < 4 ? 125 : 0;
                 }
             }
 
