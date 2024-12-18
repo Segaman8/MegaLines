@@ -2,7 +2,7 @@
 
 import QtQuick 2.0
 import QtQuick.Layouts 1.0
-import QtQuick.Controls 1.0
+import QtQuick.Controls 2.0
 import QtQuick.Window 2.12
 import com.PlaygroundField 1.0
 
@@ -58,14 +58,13 @@ Window {
      * Content
      ********************************************/
 
-    PageTitle {
+    SwipeView {
         anchors.fill: parent
-        visible: tab === 0
-    }
+        currentIndex: tab
+        interactive: false
 
-    PageGame {
-        anchors.fill: parent
-        visible: tab === 1
+        PageTitle {}
+        PageGame {}
     }
 }
 
