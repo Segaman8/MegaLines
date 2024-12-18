@@ -22,6 +22,7 @@ Item {
     /// @{
 
     property string formName: "PageGame"
+    property bool gameOver: false
 
     property QtObject internal: QtObject {
         property bool landscape: root.height < root.width
@@ -140,6 +141,24 @@ Item {
 
         model: fieldModel
         delegate: compCell
+    }
+
+    /* game over */
+
+    RotatingImageWidget {
+        x: root.internal.landscape
+         ? width * 0.05
+         : (root.width - width) / 2
+        y: (root.height - height) / 2
+        z: 50
+        width: root.internal.landscape
+             ? root.width / 2
+             : root.width * 0.75
+        height: root.internal.landscape
+              ? root.height
+              : width * 0.75
+        visible: root.gameOver
+        source: "qrc:/assets/GameOver.png"
     }
 }
 

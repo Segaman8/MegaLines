@@ -17,6 +17,14 @@ class BridgePageGame : public FormBridgeBase
   Q_OBJECT
 
   /****************************************//**
+   * @name VARIABLES
+   *******************************************/
+  /// @{
+protected:
+  QObject *m_form;
+  /// @}
+
+  /****************************************//**
    * @name CONSTRUCT/DESTRUCT
    *******************************************/
   /// @{

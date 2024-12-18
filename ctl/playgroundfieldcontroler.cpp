@@ -160,6 +160,8 @@ bool PlaygroundFieldControler::createAt (quint16 a_x, quint16 a_y, Entity::Type 
   entity.setType (a_type);
 
   emit sigCreated ({ a_x, a_y });
+  if (p->freeIndexes.size() == 0)
+    emit sigGameOver();
   return true;
 }
 

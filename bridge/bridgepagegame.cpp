@@ -22,6 +22,7 @@ static bool s_selected  = false;
 
 BridgePageGame::BridgePageGame (QObject *a_parent)
   : FormBridgeBase (a_parent)
+  , m_form (nullptr)
 {
   /* variables */
   auto ctl  = PlaygroundFieldControler::instance();
@@ -47,6 +48,7 @@ BridgePageGame::~BridgePageGame()
 void BridgePageGame::connectSignalsAndSlots (QObject *a_qmlForm)
 {
   FormBridgeBase::connectSignalsAndSlots (a_qmlForm);
+  m_form  = a_qmlForm;
 }
 
 QString BridgePageGame::formName() const
@@ -77,12 +79,17 @@ void BridgePageGame::slotScoreChanged (quint32 a_value)
 void BridgePageGame::slotNewGame()
 {
   s_selected  = false;
+
+  m_form->setProperty ("gameOver", false);
+
   emit sigScoreUpdate (0);
 }
 
 void BridgePageGame::slotGameOver()
 {
   DEBUGINFO;
+
+  m_form->setProperty ("gameOver", true);
 }
 
 void BridgePageGame::slotGotLine (QList<Position> a_positions)
