@@ -50,6 +50,13 @@ protected:
   /// @{
 signals:
   void sigScoreUpdate (QVariant a_score);
+  void sigMoved(
+      QVariant a_fromX,
+      QVariant a_fromY,
+      QVariant a_toX,
+      QVariant a_toY,
+      QVariant a_type
+    );
   /// @}
 
   /****************************************//**
@@ -63,6 +70,7 @@ public slots:
   void slotScoreChanged (quint32 a_value);
   void slotNewGame();
   void slotGameOver();
+  void slotMoved (Position a_from, Position a_to);
   void slotGotLine (QList<Position> a_positions);
 
   /* GUI */

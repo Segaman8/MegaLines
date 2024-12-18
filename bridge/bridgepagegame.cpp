@@ -92,6 +92,23 @@ void BridgePageGame::slotGameOver()
   m_form->setProperty ("gameOver", true);
 }
 
+void BridgePageGame::slotMoved (Position a_from, Position a_to)
+{
+  DEBUGINFO;
+
+  auto ctl  = PlaygroundFieldControler::instance();
+  auto type = ctl->at (a_to.x, a_to.y).type();
+
+  if (type != Entity::Type::Free)
+    emit sigMoved(
+        a_from.x,
+        a_from.y,
+        a_to.x,
+        a_to.y,
+        int (type)
+      );
+}
+
 void BridgePageGame::slotGotLine (QList<Position> a_positions)
 {
   DEBUGINFO;

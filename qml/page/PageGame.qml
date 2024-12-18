@@ -25,16 +25,35 @@ Item {
     property bool gameOver: false
 
     property QtObject internal: QtObject {
+        readonly property real moveAnimSpeed: 62.5
         property bool landscape: root.height < root.width
         property real fieldSize: landscape ? root.height : root.width
         property real cellSize: fieldSize / fieldControler.width
         property int score: 0
+
+    }
+
+    property QtObject moved: QtObject {
+        property bool active: false
+        property int fromX
+        property int fromY
+        property int toX
+        property int toY
+        property int type
     }
 
     PlaygroundFieldModel {
         id: fieldModel
 
         Component.onCompleted: attachControler (fieldControler);
+    }
+
+    Timer {
+        id: movedDeactivationTimer
+        interval: root.internal.moveAnimSpeed
+        repeat: false
+        running: false
+        onTriggered: root.moved.active = false;
     }
 
     /// @}
@@ -56,6 +75,18 @@ Item {
 
     function slotScoreUpdate (a_value) {
         root.internal.score = a_value;
+    }
+
+    function slotMoved (a_fromX, a_fromY, a_toX, a_toY, a_type) {
+        root.moved.fromX    = a_fromX;
+        root.moved.fromY    = a_fromY;
+        root.moved.toX      = a_toX;
+        root.moved.toX      = a_toY;
+        root.moved.type     = a_type;
+
+        movedSphere.moveTo (a_fromX, a_fromY);
+        root.moved.active   = true;
+        movedSphere.moveTo (a_toX, a_toY);
     }
 
     /// @}
@@ -152,8 +183,8 @@ Item {
                                     ? parent.height * 0.025
                                     : parent.height
                 property bool selected: model.selected
-                property int xx: model.x
-                property int yy: model.y
+                // property int xx: model.x
+                // property int yy: model.y
             }
 
             // Rectangle {
@@ -256,6 +287,7 @@ Item {
     /* play field */
 
     GridView {
+        id: playgroundFieldView
         y: root.internal.landscape
          ? 0
          : (root.height - height) / 2
@@ -285,6 +317,60 @@ Item {
               : width * 0.75
         visible: root.gameOver
         source: "qrc:/assets/GameOver.png"
+    }
+
+    /* sphere moved animation */
+
+    Loader {
+        id: movedSphere
+        z: 40
+        width: root.internal.cellSize
+        height: root.internal.cellSize
+        visible: active
+        sourceComponent: compSphere
+
+        /* animations */
+
+        Behavior on x {
+            PropertyAnimation {
+                id: movedSphereAnimX
+                duration: 0
+            }
+        }
+
+        Behavior on y {
+            PropertyAnimation {
+                id: movedSphereAnimY
+                duration: 0
+            }
+        }
+
+        /* functions */
+
+        function moveTo (a_x, a_y) {
+            x   = playgroundFieldView.x + a_x * width;
+            y   = playgroundFieldView.y + a_y * height;
+        }
+
+        /* variables */
+
+        property int type: root.moved.type
+        property real margin: height * 0.025
+        property bool selected: true
+
+        property bool active: root.moved.active
+
+        /* animation speed */
+
+        onActiveChanged: {
+            var speed   = active ? root.internal.moveAnimSpeed : 0;
+
+            movedSphereAnimX.duration   = speed;
+            movedSphereAnimY.duration   = speed;
+
+            if (active)
+                movedDeactivationTimer.start();
+        }
     }
 }
 

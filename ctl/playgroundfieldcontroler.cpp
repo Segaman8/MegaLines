@@ -261,8 +261,8 @@ bool PlaygroundFieldControler::moveTo (quint16 a_x, quint16 a_y)
 
   auto movedItem  = p->selected;
   p->selected = p->invalid;
-  emit sigMoved (movedItem, current);
   _detectLine (current);
+  emit sigMoved (movedItem, current);
   return true;
 }
 
