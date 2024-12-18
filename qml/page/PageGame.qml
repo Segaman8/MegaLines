@@ -65,7 +65,73 @@ Item {
     /// @{
 
     Component {
+        id: compSphere
+
+        // property int type
+        // property real margin
+        // property bool selected
+
+        Rectangle {
+            id: compSphereRoot
+            anchors.fill: parent
+            anchors.margins: margin
+            radius: height
+            color: {
+                var colorSet =
+                [
+                    "#a00",
+                    "#00a",
+                    "#0a0",
+                    "#aa0",
+                    "#444",
+                ];
+                return colorSet[type];
+            }
+            border.width: selected * 2
+            border.color: "#eee"
+
+            /* variables */
+
+            property int type: compSphereRoot.parent.type
+            property real margin: compSphereRoot.parent.margin
+            property bool selected: compSphereRoot.parent.selected
+
+            /* grow/shrink animation */
+
+            Behavior on margin {
+                PropertyAnimation {
+                    id: marginAnim
+                    duration: 125
+                }
+            }
+
+            /* sphere glass effect */
+
+            Rectangle {
+                anchors.fill: parent
+                anchors.bottomMargin: parent.height * 0.25
+                anchors.leftMargin: parent.width * 0.125
+                anchors.rightMargin: parent.width * 0.125
+                color: "#eee"
+                radius: height
+                opacity: 0.25
+            }
+
+            /* turn off shrink animation, if sphere destroyed */
+
+            function updateAnim() {
+                marginAnim.duration = type === 4 ? 125 : 0;
+            }
+
+            onTypeChanged: updateAnim()
+            onMarginChanged: updateAnim()
+        }
+    }
+
+    Component {
         id: compCell
+
+        /* cell background */
 
         Rectangle {
             width:  root.internal.cellSize
@@ -75,50 +141,75 @@ Item {
             border.width: 2
             border.color: "#333"
 
-            Rectangle {
+            /* sphere */
+
+            Loader {
                 anchors.fill: parent
-                anchors.margins: margin
-                radius: height
-                color: {
-                    var colorSet =
-                    [
-                        "#a00",
-                        "#00a",
-                        "#0a0",
-                        "#aa0",
-                        "#444",
-                    ];
-                    return colorSet[type];
-                }
-                border.width: model.selected * 2
-                border.color: "#eee"
+                sourceComponent: compSphere
 
                 property int type: model.type
                 property real margin: type < 4
                                     ? parent.height * 0.025
                                     : parent.height
-
-                Behavior on margin {
-                    PropertyAnimation {
-                        id: marginAnim
-                        duration: 125
-                    }
-                }
-
-                Rectangle {
-                    anchors.fill: parent
-                    anchors.bottomMargin: parent.height * 0.25
-                    anchors.leftMargin: parent.width * 0.125
-                    anchors.rightMargin: parent.width * 0.125
-                    color: "#eee"
-                    radius: height
-                    opacity: 0.25
-                }
-
-                onTypeChanged: {
-                    marginAnim.duration = type < 4 ? 125 : 0;
-                }
+                property bool selected: model.selected
+                property int xx: model.x
+                property int yy: model.y
             }
+
+            // Rectangle {
+            //     anchors.fill: parent
+            //     anchors.margins: margin
+            //     radius: height
+            //     color: {
+            //         var colorSet =
+            //         [
+            //             "#a00",
+            //             "#00a",
+            //             "#0a0",
+            //             "#aa0",
+            //             "#444",
+            //         ];
+            //         return colorSet[type];
+            //     }
+            //     border.width: model.selected * 2
+            //     border.color: "#eee"
+
+            //     /* variables */
+
+            //     property int type: model.type
+            //     property real margin: type < 4
+            //                         ? parent.height * 0.025
+            //                         : parent.height
+
+            //     /* grow/shrink animation */
+
+            //     Behavior on margin {
+            //         PropertyAnimation {
+            //             id: marginAnim
+            //             duration: 125
+            //         }
+            //     }
+
+            //     /* sphere glass effect */
+
+            //     Rectangle {
+            //         anchors.fill: parent
+            //         anchors.bottomMargin: parent.height * 0.25
+            //         anchors.leftMargin: parent.width * 0.125
+            //         anchors.rightMargin: parent.width * 0.125
+            //         color: "#eee"
+            //         radius: height
+            //         opacity: 0.25
+            //     }
+
+            //     /* turn off shrink animation, if sphere destroyed */
+
+            //     onTypeChanged: {
+            //         marginAnim.duration = type < 4 ? 125 : 0;
+            //     }
+            // }
+
+            /* clickable */
 
             MouseArea {
                 anchors.fill: parent
