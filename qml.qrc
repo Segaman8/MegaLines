@@ -4,5 +4,6 @@
         <file>qml/page/PageGame.qml</file>
         <file>qml/page/PageTitle.qml</file>
         <file>qml/widgets/ButtonWidget.qml</file>
+        <file>qml/widgets/RotatingImageWidget.qml</file>
     </qresource>
 </RCC>

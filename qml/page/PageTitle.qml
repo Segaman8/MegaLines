@@ -59,7 +59,7 @@ Item {
 
     /* title image */
 
-    Image {
+    RotatingImageWidget {
         id: titleImage
         x: root.internal.landscape
          ? width * 0.05
@@ -70,42 +70,7 @@ Item {
         height: root.internal.landscape
               ? root.height
               : width * 0.75
-
-        fillMode: Image.PreserveAspectFit
         source: "qrc:/assets/MegaLines.png"
-
-        transform: Rotation {
-            id: titleRotation
-            origin.x: titleImage.width / 2
-            origin.y: titleImage.height / 2
-            angle: 0
-        }
-
-        PropertyAnimation {
-            target: titleRotation
-            property: "angle"
-            from: 0 - root.internal.titleAnimAngle
-            to: root.internal.titleAnimAngle
-            duration: 1000
-            easing.type: Easing.InOutSine
-            loops: 1
-            running: true
-
-            onStopped: {
-                if (from === 0 - root.internal.titleAnimAngle)
-                {
-                    from = root.internal.titleAnimAngle;
-                    to   = 0 - root.internal.titleAnimAngle;
-                    start();
-                }
-                else
-                {
-                    from = 0 - root.internal.titleAnimAngle;
-                    to   = root.internal.titleAnimAngle;
-                    start();
-                }
-            }
-        }
     }
 
     /* controls */
