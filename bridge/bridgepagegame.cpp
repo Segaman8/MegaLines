@@ -109,9 +109,17 @@ void BridgePageGame::slotMoved (Position a_from, Position a_to)
       );
 }
 
-void BridgePageGame::slotGotLine (QList<Position> a_positions)
+void BridgePageGame::slotGotLine (const QList<Position> &a_positions)
 {
   DEBUGINFO;
+
+  /* collect positions into variant list */
+  QVariantList list;
+  for (auto pos : a_positions)
+    list << QPoint { pos.x, pos.y };
+
+  /* send to qml */
+  emit sigDestroyed (list);
 }
 
 void BridgePageGame::slotEntityClicked (int a_index)
@@ -126,14 +134,24 @@ void BridgePageGame::slotEntityClicked (int a_index)
   }
   else
   {
+    /* moved */
     if (ctl->moveTo (pos.x, pos.y))
     {
       DEBUGINFO << "moving" << a_index;
       s_selected = false;
       _spawnNewEntities();
     }
+
+    /* deselected */
     else
-      DEBUGINFO << "failed moving" << a_index;
+    {
+      auto selected = ctl->selected();
+      if (selected.x == ctl->width()
+          || selected.y == ctl->height())
+        s_selected = false;
+      else
+        DEBUGINFO << "failed moving" << a_index;
+    }
   }
 }
 

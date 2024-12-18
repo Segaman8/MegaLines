@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>assets/GameOver.png</file>
         <file>assets/MegaLines.png</file>
+        <file>assets/Star.png</file>
     </qresource>
 </RCC>

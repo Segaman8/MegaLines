@@ -57,6 +57,7 @@ signals:
       QVariant a_toY,
       QVariant a_type
     );
+  void sigDestroyed (QVariant a_positions);
   /// @}
 
   /****************************************//**
@@ -71,7 +72,7 @@ public slots:
   void slotNewGame();
   void slotGameOver();
   void slotMoved (Position a_from, Position a_to);
-  void slotGotLine (QList<Position> a_positions);
+  void slotGotLine (const QList<Position> &a_positions);
 
   /* GUI */
 

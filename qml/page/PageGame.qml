@@ -24,14 +24,33 @@ Item {
     property string formName: "PageGame"
     property bool gameOver: false
 
+    /* internal variables*/
+
     property QtObject internal: QtObject {
-        readonly property real moveAnimSpeed: 62.5
+        /* constants */
+
+        readonly property real moveAnimSpeed: 125
+
+        /* variables */
+
         property bool landscape: root.height < root.width
         property real fieldSize: landscape ? root.height : root.width
         property real cellSize: fieldSize / fieldControler.width
         property int score: 0
+        property var removed: []
+        property bool removedActive: false
 
+        /* animations */
+
+        Behavior on score {
+            PropertyAnimation {
+                duration: 500
+                easing.type: Easing.OutQuad
+            }
+        }
     }
+
+    /* moved animation variables */
 
     property QtObject moved: QtObject {
         property bool active: false
@@ -42,18 +61,26 @@ Item {
         property int type
     }
 
+    /* model */
+
     PlaygroundFieldModel {
         id: fieldModel
 
         Component.onCompleted: attachControler (fieldControler);
     }
 
+    /* moved animation timer */
+
     Timer {
         id: movedDeactivationTimer
         interval: root.internal.moveAnimSpeed
         repeat: false
         running: false
-        onTriggered: root.moved.active = false;
+        onTriggered: {
+            root.moved.active           = false;
+            root.internal.removedActive = false;
+            root.internal.removed       = [];
+        }
     }
 
     /// @}
@@ -89,11 +116,18 @@ Item {
         movedSphere.moveTo (a_toX, a_toY);
     }
 
+    function slotDestroyed (a_positions) {
+        root.internal.removed       = a_positions;
+        root.internal.removedActive = true;
+    }
+
     /// @}
     /****************************************//**
      * @name COMPONENTS
      ********************************************/
     /// @{
+
+    /* sphere object */
 
     Component {
         id: compSphere
@@ -159,6 +193,8 @@ Item {
         }
     }
 
+    /* cell delegate */
+
     Component {
         id: compCell
 
@@ -183,67 +219,86 @@ Item {
                                     ? parent.height * 0.025
                                     : parent.height
                 property bool selected: model.selected
-                // property int xx: model.x
-                // property int yy: model.y
+
+                // onMarginChanged: {
+                //     if (margin === parent.height)
+                //         destroyedImage.begin();
+                // }
             }
 
-            // Rectangle {
-            //     anchors.fill: parent
-            //     anchors.margins: margin
-            //     radius: height
-            //     color: {
-            //         var colorSet =
-            //         [
-            //             "#a00",
-            //             "#00a",
-            //             "#0a0",
-            //             "#aa0",
-            //             "#444",
-            //         ];
-            //         return colorSet[type];
-            //     }
-            //     border.width: model.selected * 2
-            //     border.color: "#eee"
+            /* destroyed */
 
-            //     /* variables */
+            Image {
+                id: destroyedImage
+                anchors.fill: parent
+                source: "qrc:/assets/Star.png"
+                opacity: 0
 
-            //     property int type: model.type
-            //     property real margin: type < 4
-            //                         ? parent.height * 0.025
-            //                         : parent.height
+                transform: Rotation {
+                    id: rotation
+                    origin.x: width / 2
+                    origin.y: height / 2
+                    angle: 0
+                }
 
-            //     /* grow/shrink animation */
+                property bool active: root.internal.removedActive
 
-            //     Behavior on margin {
-            //         PropertyAnimation {
-            //             id: marginAnim
-            //             duration: 125
-            //         }
-            //     }
+                //function begin() {
+                onActiveChanged: {
+                    if (active === false)
+                        return;
 
-            //     /* sphere glass effect */
+                    //console.log(`${model.x}x${model.y}`);
 
-            //     Rectangle {
-            //         anchors.fill: parent
-            //         anchors.bottomMargin: parent.height * 0.25
-            //         anchors.leftMargin: parent.width * 0.125
-            //         anchors.rightMargin: parent.width * 0.125
-            //         color: "#eee"
-            //         radius: height
-            //         opacity: 0.25
-            //     }
+                    /* check if removed */
+                    var found = false;
+                    for (var i = 0; i < root.internal.removed.length; i++)
+                    {
+                        var pos = root.internal.removed[i];
+                        if (pos.x === model.x
+                            && pos.y === model.y)
+                        {
+                            found   = true;
+                            break;
+                        }
+                    }
 
-            //     /* turn off shrink animation, if sphere destroyed */
+                    /* if not found, return */
+                    if (found === false)
+                        return;
 
-            //     onTypeChanged: {
-            //         marginAnim.duration = type < 4 ? 125 : 0;
-            //     }
-            // }
+                    /* start animation */
+                    opacity = 1;
+                    destroyedTimer.start();
+                }
+
+                Behavior on opacity { PropertyAnimation { duration: 25 } }
+
+                PropertyAnimation {
+                    target: rotation
+                    property: "angle"
+                    from: 0
+                    to: 360
+                    duration: 500
+                    easing.type: Easing.Linear
+                    loops: Animation.Infinite
+                    running: destroyedImage.opacity !== 0
+                }
+
+                Timer {
+                    id: destroyedTimer
+                    interval: 250
+                    repeat: false
+                    running: false
+                    onTriggered: destroyedImage.opacity = 0
+                }
+            }
 
             /* clickable */
 
             MouseArea {
                 anchors.fill: parent
+                enabled: !root.moved.active
                 onClicked: root.sigEntityClicked (model.index);
             }
         }
@@ -257,13 +312,14 @@ Item {
     /* score */
 
     Text {
+        id: scoreLabel
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.topMargin: 12
         anchors.rightMargin: 20
         z: 50
 
-        font.pixelSize: 14
+        font.pixelSize: 20
         text: `Score: ${root.internal.score}`
         color: "#ddd"
     }
@@ -271,7 +327,7 @@ Item {
     /* menu button */
 
     ButtonWidget {
-        anchors.top: parent.top
+        anchors.top: scoreLabel.top
         anchors.right: parent.right
         anchors.topMargin: 30
         z: 50
@@ -360,7 +416,7 @@ Item {
 
         property bool active: root.moved.active
 
-        /* animation speed */
+        /* change animation speed */
 
         onActiveChanged: {
             var speed   = active ? root.internal.moveAnimSpeed : 0;
@@ -368,6 +424,7 @@ Item {
             movedSphereAnimX.duration   = speed;
             movedSphereAnimY.duration   = speed;
 
+            /* deactivate after animation is done */
             if (active)
                 movedDeactivationTimer.start();
         }

@@ -208,10 +208,6 @@ bool PlaygroundFieldControler::select (quint16 a_x, quint16 a_y)
   auto index    = coordToIndex (a_x, a_y);
   auto &entity  = p->field[index];
 
-  /* fail, if not used */
-  if (entity.type() == Entity::Type::Free)
-    return false;
-
   /* unselect, if already selected */
   Position newSelection { a_x, a_y };
   if (p->selected == newSelection)
@@ -221,6 +217,10 @@ bool PlaygroundFieldControler::select (quint16 a_x, quint16 a_y)
       emit sigUnselected (unselected);
       return true;
     }
+
+  /* fail, if not used */
+  if (entity.type() == Entity::Type::Free)
+    return false;
 
   /* select */
   p->selected = newSelection;
@@ -245,6 +245,16 @@ bool PlaygroundFieldControler::moveTo (quint16 a_x, quint16 a_y)
   /* get entity */
   auto index    = coordToIndex (current);
   auto &entity  = p->field[index];
+
+  /* unselect, if already selected */
+  Position newSelection { a_x, a_y };
+  if (p->selected == newSelection)
+    {
+      auto unselected = p->selected;
+      p->selected = p->invalid;
+      emit sigUnselected (unselected);
+      return false;
+    }
 
   /* fail, if not free */
   if (entity.type() != Entity::Type::Free)
