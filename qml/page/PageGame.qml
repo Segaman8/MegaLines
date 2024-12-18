@@ -70,20 +70,40 @@ Item {
         Rectangle {
             width:  root.internal.cellSize
             height: root.internal.cellSize
-            radius: height
-            color: {
-                var colorSet =
-                [
-                    "#a00",
-                    "#00a",
-                    "#0a0",
-                    "#aa0",
-                    "#444",
-                ];
-                return colorSet[model.type];
+            radius: height * 0.125
+            color: "#444"
+            border.width: 2
+            border.color: "#333"
+
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: parent.height * 0.025
+                radius: height
+                color: {
+                    var colorSet =
+                    [
+                        "#a00",
+                        "#00a",
+                        "#0a0",
+                        "#aa0",
+                        "#444",
+                    ];
+                    return colorSet[model.type];
+                }
+                border.width: model.selected * 2
+                border.color: "#eee"
+                visible: model.type < 4
+
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.bottomMargin: parent.height * 0.25
+                    anchors.leftMargin: parent.width * 0.125
+                    anchors.rightMargin: parent.width * 0.125
+                    color: "#eee"
+                    radius: height
+                    opacity: 0.25
+                }
             }
-            border.width: model.selected * 2
-            border.color: "#eee"
 
             MouseArea {
                 anchors.fill: parent
